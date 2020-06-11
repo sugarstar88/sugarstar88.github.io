@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <title>SpringMVC &middot; SugarStar</title>
+    <meta name="generator" content="Hugo 0.55.5" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="author" content="SugarStar">
+    
+      <meta name="description" content="">
+    
+    
+    <link rel="canonical" href="https://sugarstar88.github.io/2020/06/11/springmvc/"/>
+    <link rel="icon" href="https://sugarstar88.github.io/favicon.ico">
+    <link rel="apple-touch-icon" href="https://sugarstar88.github.io/apple-touch-icon.png"/>
+    <link rel="stylesheet" href="https://sugarstar88.github.io/css/style.css">
+    <link rel="stylesheet" href="https://sugarstar88.github.io/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://sugarstar88.github.io/css/monokai.css">
+    <link rel="stylesheet" href="https://sugarstar88.github.io/fancybox/jquery.fancybox.css">
+    
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400italic,400,600' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Source+Code+Pro' rel='stylesheet' type='text/css'>
+    <meta property="og:title" content="SpringMVC" />
+<meta property="og:description" content="一、简介 SpringMVC重要组件  DispatcherServlet，前段控制器，接受所有请求（如果配置/不包含jsp） HandlerMapping，解析请求格式，判断希望执行哪个具体的方法 HandlerAdapter，负责调用具体的方法 ViewResolver，视图解析器，解析结果，准备跳转到具体的物理视图  运行原理 Spring容器和和SpringMVC容器的关系  SpringMVC容器中能够调用Spring容器中的所有内容
+ 父子容器
+  二、SpringMVC环境搭建 1. 导入jar包  commons-logging-1.1.3.jar spring-aop-4.1.6.RELEASE.jar spring-aspects-4.1.6.RELEASE.jar spring-beans-4.1.6.RELEASE.jar spring-context-4.1.6.RELEASE.jar spring-core-4.1.6.RELEASE.jar spring-expression-4.1.6.RELEASE.jar spring-jdbc-4.1.6.RELEASE.jar spring-tx-4.1.6.RELEASE.jar spring-web-4.1.6.RELEASE.jar spring-webmvc-4.1.6.RELEASE.jar  2. 在web.xml中配置前端控制器  如果不配置&lt;init-param/&gt;会在/WEB-INF/&lt;servlet-name&gt;-servlet.xml  &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt; &lt;web-app xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns=&quot;http://java.sun.com/xml/ns/javaee&quot; xsi:schemaLocation=&quot;http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd&quot; id=&quot;WebApp_ID&quot; version=&quot;3.0&quot;&gt; &lt;!-- 配置前端控制器 --&gt; &lt;servlet&gt; &lt;servlet-name&gt;dispatcherServlet&lt;/servlet-name&gt; &lt;servlet-class&gt;org.springframework.web.servlet.DispatcherServlet&lt;/servlet-class&gt; &lt;init-param&gt; &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt; &lt;param-value&gt;classpath:springmvc.xml&lt;/param-value&gt; &lt;/init-param&gt; &lt;load-on-startup&gt;1&lt;/load-on-startup&gt; &lt;/servlet&gt; &lt;servlet-mapping&gt; &lt;servlet-name&gt;dispatcherServlet&lt;/servlet-name&gt; &lt;url-pattern&gt;/&lt;/url-pattern&gt; &lt;/servlet-mapping&gt; &lt;/web-app&gt;  &lt; url-pattern &gt; / &lt;/ url-pattern &gt; 不会匹配到*." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://sugarstar88.github.io/2020/06/11/springmvc/" />
+<meta property="article:published_time" content="2020-06-11T15:29:12&#43;08:00"/>
+<meta property="article:modified_time" content="2020-06-11T15:29:12&#43;08:00"/>
+
+    
+    
+<meta itemprop="name" content="SpringMVC">
+<meta itemprop="description" content="一、简介 SpringMVC重要组件  DispatcherServlet，前段控制器，接受所有请求（如果配置/不包含jsp） HandlerMapping，解析请求格式，判断希望执行哪个具体的方法 HandlerAdapter，负责调用具体的方法 ViewResolver，视图解析器，解析结果，准备跳转到具体的物理视图  运行原理 Spring容器和和SpringMVC容器的关系  SpringMVC容器中能够调用Spring容器中的所有内容
+ 父子容器
+  二、SpringMVC环境搭建 1. 导入jar包  commons-logging-1.1.3.jar spring-aop-4.1.6.RELEASE.jar spring-aspects-4.1.6.RELEASE.jar spring-beans-4.1.6.RELEASE.jar spring-context-4.1.6.RELEASE.jar spring-core-4.1.6.RELEASE.jar spring-expression-4.1.6.RELEASE.jar spring-jdbc-4.1.6.RELEASE.jar spring-tx-4.1.6.RELEASE.jar spring-web-4.1.6.RELEASE.jar spring-webmvc-4.1.6.RELEASE.jar  2. 在web.xml中配置前端控制器  如果不配置&lt;init-param/&gt;会在/WEB-INF/&lt;servlet-name&gt;-servlet.xml  &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt; &lt;web-app xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns=&quot;http://java.sun.com/xml/ns/javaee&quot; xsi:schemaLocation=&quot;http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd&quot; id=&quot;WebApp_ID&quot; version=&quot;3.0&quot;&gt; &lt;!-- 配置前端控制器 --&gt; &lt;servlet&gt; &lt;servlet-name&gt;dispatcherServlet&lt;/servlet-name&gt; &lt;servlet-class&gt;org.springframework.web.servlet.DispatcherServlet&lt;/servlet-class&gt; &lt;init-param&gt; &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt; &lt;param-value&gt;classpath:springmvc.xml&lt;/param-value&gt; &lt;/init-param&gt; &lt;load-on-startup&gt;1&lt;/load-on-startup&gt; &lt;/servlet&gt; &lt;servlet-mapping&gt; &lt;servlet-name&gt;dispatcherServlet&lt;/servlet-name&gt; &lt;url-pattern&gt;/&lt;/url-pattern&gt; &lt;/servlet-mapping&gt; &lt;/web-app&gt;  &lt; url-pattern &gt; / &lt;/ url-pattern &gt; 不会匹配到*.">
+
+
+<meta itemprop="datePublished" content="2020-06-11T15:29:12&#43;08:00" />
+<meta itemprop="dateModified" content="2020-06-11T15:29:12&#43;08:00" />
+<meta itemprop="wordCount" content="893">
+
+
+
+<meta itemprop="keywords" content="" />
+
+    <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="SpringMVC"/>
+<meta name="twitter:description" content="一、简介 SpringMVC重要组件  DispatcherServlet，前段控制器，接受所有请求（如果配置/不包含jsp） HandlerMapping，解析请求格式，判断希望执行哪个具体的方法 HandlerAdapter，负责调用具体的方法 ViewResolver，视图解析器，解析结果，准备跳转到具体的物理视图  运行原理 Spring容器和和SpringMVC容器的关系  SpringMVC容器中能够调用Spring容器中的所有内容
+ 父子容器
+  二、SpringMVC环境搭建 1. 导入jar包  commons-logging-1.1.3.jar spring-aop-4.1.6.RELEASE.jar spring-aspects-4.1.6.RELEASE.jar spring-beans-4.1.6.RELEASE.jar spring-context-4.1.6.RELEASE.jar spring-core-4.1.6.RELEASE.jar spring-expression-4.1.6.RELEASE.jar spring-jdbc-4.1.6.RELEASE.jar spring-tx-4.1.6.RELEASE.jar spring-web-4.1.6.RELEASE.jar spring-webmvc-4.1.6.RELEASE.jar  2. 在web.xml中配置前端控制器  如果不配置&lt;init-param/&gt;会在/WEB-INF/&lt;servlet-name&gt;-servlet.xml  &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt; &lt;web-app xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns=&quot;http://java.sun.com/xml/ns/javaee&quot; xsi:schemaLocation=&quot;http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd&quot; id=&quot;WebApp_ID&quot; version=&quot;3.0&quot;&gt; &lt;!-- 配置前端控制器 --&gt; &lt;servlet&gt; &lt;servlet-name&gt;dispatcherServlet&lt;/servlet-name&gt; &lt;servlet-class&gt;org.springframework.web.servlet.DispatcherServlet&lt;/servlet-class&gt; &lt;init-param&gt; &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt; &lt;param-value&gt;classpath:springmvc.xml&lt;/param-value&gt; &lt;/init-param&gt; &lt;load-on-startup&gt;1&lt;/load-on-startup&gt; &lt;/servlet&gt; &lt;servlet-mapping&gt; &lt;servlet-name&gt;dispatcherServlet&lt;/servlet-name&gt; &lt;url-pattern&gt;/&lt;/url-pattern&gt; &lt;/servlet-mapping&gt; &lt;/web-app&gt;  &lt; url-pattern &gt; / &lt;/ url-pattern &gt; 不会匹配到*."/>
+
+    
+
+    
+
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+</head>
+<body>
+<div class="container">
+
+
+<div id="container">
+	<header id="header">
+  <div id="header-main" class="header-inner">
+    <div class="outer">
+      <a href="https://sugarstar88.github.io/" id="logo">
+          
+          <i class="logo" style="background-image: url('https://sugarstar88.github.io/css/images/logo.png')"></i>
+          
+          <span class="site-title">SugarStar</span>
+      </a>
+      <nav id="main-nav">
+          
+          
+          <a class="main-nav-link" href="https://sugarstar88.github.io/">主页</a>
+          
+          
+          
+          
+          
+          
+
+          
+
+          
+          
+          
+          
+          <a class="main-nav-link" href="https://sugarstar88.github.io/tags/">标签</a>
+          
+          
+          
+          <a class="main-nav-link" href="https://sugarstar88.github.io/categories/">目录分类</a>
+          
+          
+      </nav>
+        <nav id="sub-nav">
+          <div class="profile" id="profile-nav">
+            <a id="profile-anchor" href="javascript:;"><img class="avatar" src="https://sugarstar88.github.io/css/images/SugarStar.jpg"><i class="fa fa-caret-down"></i></a>
+          </div>
+        </nav>
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form">
+              <input type="search" name="q" class="search-form-input" placeholder="搜索">
+              <button type="submit" class="search-form-submit">
+              </button>
+              <input type="hidden" name="sitesearch" value="https://sugarstar88.github.io/" />
+         </form>
+        </div>
+    </div>
+  </div>
+  <div id="main-nav-mobile" class="header-sub header-inner">
+    <table class="menu outer">
+      <tbody>
+          <tr>
+          
+          
+          <td><a class="main-nav-link" href="https://sugarstar88.github.io/">主页</a></td>
+          
+          
+          
+          
+          
+          
+
+          
+
+          
+          
+          
+          
+          <td><a class="main-nav-link" href="https://sugarstar88.github.io/tags/">标签</a></td>
+          
+          
+          
+          <td><a class="main-nav-link" href="https://sugarstar88.github.io/categories/">目录分类</a></td>
+          
+          
+          <td>
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form">
+          <input type="search" name="q" class="search-form-input" placeholder="Search">
+          <input type="hidden" name="sitesearch" value="https://sugarstar88.github.io/" />
+          </form>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</header>
+
+   	
+   	<div class="outer">
+   	
+    	<aside id="profile">
+  <div class="inner profile-inner">
+    <div class="base-info profile-block">
+      
+      <img id="avatar" src="https://sugarstar88.github.io/css/images/SugarStar.jpg">
+      
+      <h2 id="name">SugarStar</h2>
+      <h3 id="title">程序员</h3>
+      <span id="location"><i class="fa fa-map-marker"></i>江苏·南京</span>
+      
+          <a id="follow" href="https://github.com/SugarStars">
+              关注
+          </a>
+      
+    </div>
+    <div class="article-info profile-block">
+      <div class="article-info-block">
+        3
+        <span>文章</span>
+      </div>
+      <div class="article-info-block">
+        
+          0
+        
+        <span>
+            标签
+        </span>
+      </div>
+    </div>
+    <div class="profile-block social-links">
+      <table>
+        <tr>
+          
+<td><a href="//github.com/SugarStars" target="_blank" title="GitHub"><i class="fa fa-github"></i></a></td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          <td><a href="https://sugarstar88.github.io/index.xml" target="_blank" title="RSS"><i class="fa fa-rss"></i></a></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</aside>
+
+    
+
+    <section id="main">
+    
+    <article id="page-undefined" class="article article-type-page" itemscope="" itemprop="blogPost">
+    <div class="article-inner">
+        
+
+        <header class="article-header">
+    <a href="https://sugarstar88.github.io/2020/06/11/springmvc/">
+    <h1 class="article-title" itemprop="name">
+        SpringMVC
+    </h1>
+    </a>
+    <div class="article-meta">
+
+        
+        <div class="article-date">
+            <i class="fa fa-calendar"></i>
+            <time datetime="2020-06-11 15:29:12 &#43;0800 CST" itemprop="datePublished">2020-06-11</time>
+            &middot;
+            893
+            
+            &middot;
+            5
+            次阅读
+        </div>
+        
+        
+
+        
+    </div>
+</header>
+
+        <div class="article-entry" itemprop="articleBody">
+            
+
+<h1 id="一-简介">一、简介</h1>
+
+<h2 id="springmvc重要组件">SpringMVC重要组件</h2>
+
+<ul>
+<li>DispatcherServlet，前段控制器，接受所有请求（如果配置/不包含jsp）</li>
+<li>HandlerMapping，解析请求格式，判断希望执行哪个具体的方法</li>
+<li>HandlerAdapter，负责调用具体的方法</li>
+<li>ViewResolver，视图解析器，解析结果，准备跳转到具体的物理视图</li>
+</ul>
+
+<h2 id="运行原理">运行原理</h2>
+
+<p><img src="https://cdn.jsdelivr.net/gh/sugarstar88/imgHosting/ITRHX-PIC/SpringMVC_Proccess.png" alt="" /></p>
+
+<h2 id="spring容器和和springmvc容器的关系">Spring容器和和SpringMVC容器的关系</h2>
+
+<ul>
+<li><p>SpringMVC容器中能够调用Spring容器中的所有内容</p></li>
+
+<li><p>父子容器</p></li>
+</ul>
+
+<p><img src="https://cdn.jsdelivr.net/gh/sugarstar88/imgHosting/ITRHX-PIC/springmvcContainer.png" alt="" /></p>
+
+<h1 id="二-springmvc环境搭建">二、SpringMVC环境搭建</h1>
+
+<h2 id="1-导入jar包">1. 导入jar包</h2>
+
+<ul>
+<li>commons-logging-1.1.3.jar</li>
+<li>spring-aop-4.1.6.RELEASE.jar</li>
+<li>spring-aspects-4.1.6.RELEASE.jar</li>
+<li>spring-beans-4.1.6.RELEASE.jar</li>
+<li>spring-context-4.1.6.RELEASE.jar</li>
+<li>spring-core-4.1.6.RELEASE.jar</li>
+<li>spring-expression-4.1.6.RELEASE.jar</li>
+<li>spring-jdbc-4.1.6.RELEASE.jar</li>
+<li>spring-tx-4.1.6.RELEASE.jar</li>
+<li>spring-web-4.1.6.RELEASE.jar</li>
+<li>spring-webmvc-4.1.6.RELEASE.jar</li>
+</ul>
+
+<h2 id="2-在web-xml中配置前端控制器">2. 在web.xml中配置前端控制器</h2>
+
+<ul>
+<li>如果不配置<code>&lt;init-param/&gt;</code>会在/WEB-INF/<code>&lt;servlet-name&gt;</code>-servlet.xml</li>
+</ul>
+
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;web-app xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+	xmlns=&quot;http://java.sun.com/xml/ns/javaee&quot;
+	xsi:schemaLocation=&quot;http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd&quot;
+	id=&quot;WebApp_ID&quot; version=&quot;3.0&quot;&gt;
+	&lt;!-- 配置前端控制器 --&gt;
+	&lt;servlet&gt;
+		&lt;servlet-name&gt;dispatcherServlet&lt;/servlet-name&gt;
+		&lt;servlet-class&gt;org.springframework.web.servlet.DispatcherServlet&lt;/servlet-class&gt;
+		&lt;init-param&gt;
+			&lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;
+			&lt;param-value&gt;classpath:springmvc.xml&lt;/param-value&gt;
+		&lt;/init-param&gt;
+		&lt;load-on-startup&gt;1&lt;/load-on-startup&gt;
+	&lt;/servlet&gt;
+	&lt;servlet-mapping&gt;
+		&lt;servlet-name&gt;dispatcherServlet&lt;/servlet-name&gt;
+		&lt;url-pattern&gt;/&lt;/url-pattern&gt;
+	&lt;/servlet-mapping&gt;
+&lt;/web-app&gt;
+</code></pre>
+
+<p><code>&lt; url-pattern &gt; / &lt;/ url-pattern &gt;</code>  不会匹配到<code>*.jsp</code>，即：<code>*.jsp</code>不会进入spring的 DispatcherServlet类 ，但<code>*.html</code>，<code>*js</code>，<code>*.css</code>，<code>*.jpg</code>等其他静态资源文件会进入DispatcherServlet类，直接访问会报404，解决方法使用 <code>&lt;mvc:resources&gt;</code>进行配置。
+<code>&lt; url-pattern &gt; /* &lt;/ url-pattern &gt;</code> 会匹配<code>*.jsp</code>，<font color="red">会出现返回jsp视图时再次进入spring的DispatcherServlet 类，导致找不到对应的@RequestMapping(&ldquo;xxx.jsp&rdquo;)所以报404错。 </font></p>
+
+<pre><code class="language-java">@RequestMapping(&quot;demo&quot;)
+public String demo(People peo) {
+    System.out.println(&quot;name:&quot; + peo.getName() + &quot;, age:&quot; + peo.getAge());
+    return &quot;main.jsp&quot;;
+}
+</code></pre>
+
+<p>运行结果</p>
+
+<p><img src="https://cdn.jsdelivr.net/gh/sugarstar88/imgHosting/ITRHX-PIC/result01.jpg" alt="" /></p>
+
+<p>总之，关于web.xml的url映射的小知识:</p>
+
+<ul>
+<li><code>&lt;url-pattern&gt;/&lt;/url-pattern&gt;</code>  会匹配到/login这样的路径型url，不会匹配到模式为<code>*.jsp</code></li>
+<li><code>&lt;url-pattern&gt;/*&lt;/url-pattern&gt;</code> 会匹配所有url：路径型的和后缀型的url(包括<code>/login</code>,<code>*.jsp</code>,<code>*.js</code>和<code>*.html</code>等)</li>
+</ul>
+
+<h2 id="3-在src下新建springmvc-xml">3. 在src下新建springmvc.xml</h2>
+
+<ul>
+<li>引入xmlns:mvc命名空间</li>
+</ul>
+
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+	xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+	xmlns:context=&quot;http://www.springframework.org/schema/context&quot;
+	xmlns:mvc=&quot;http://www.springframework.org/schema/mvc&quot;
+	xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd&quot;&gt;
+        &lt;!-- 1. 扫描注解 --&gt;
+        &lt;context:component-scan base-package=&quot;com.sugar.controller&quot;&gt;&lt;/context:component-scan&gt;
+        &lt;!-- 注解驱动 --&gt;
+        &lt;!-- org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping--&gt;
+        &lt;!-- org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter --&gt;
+        &lt;mvc:annotation-driven&gt;&lt;/mvc:annotation-driven&gt;
+        &lt;!-- 静态资源 --&gt;
+        &lt;mvc:resources location=&quot;/js/&quot; mapping=&quot;/js/**&quot;&gt;&lt;/mvc:resources&gt;
+        &lt;mvc:resources location=&quot;/css/&quot; mapping=&quot;/css/**&quot;&gt;&lt;/mvc:resources&gt;
+        &lt;mvc:resources location=&quot;/images/&quot; mapping=&quot;/images/**&quot;&gt;&lt;/mvc:resources&gt;
+&lt;/beans&gt;
+</code></pre>
+
+<h2 id="4-编写控制器类">4. 编写控制器类</h2>
+
+<pre><code class="language-java">@Controller
+public class DemoController {
+	@RequestMapping(&quot;demo&quot;)
+	public String demo() {
+		System.out.println(&quot;demo&quot;);
+		return &quot;main.jsp&quot;;
+	}
+}
+</code></pre>
+
+<h1 id="三-字符编码过滤器">三、字符编码过滤器</h1>
+
+<p>接受中文参数时防止乱码</p>
+
+<h2 id="乱码解决方案">乱码解决方案</h2>
+
+<ul>
+<li>GET请求，在tomcat配置文件<code>server.xml</code>中加上<code>URIEncoding=&quot;UTF-8&quot;</code></li>
+<li>POST请求，在接受请求参数前，加<code>req.setCharacterEncoding(&quot;UTF-8&quot;)</code>或通过<code>org.springframework.web.filter.CharacterEncodingFilter</code>中的<code>encoding</code>设置;</li>
+<li>响应时，<code>res.setContentType(&quot;text/html;charset=UTF-8&quot;)</code>或<code>res.setHeader(&quot;ContentType&quot;,&quot;text/html;charset=UTF-8&quot;)</code>或<code>res.setCharacterEncoding(&quot;UTF-8&quot;)</code>或通过<code>org.springframework.web.filter.CharacterEncodingFilter</code>中的<code>forceEncoding</code>设置</li>
+</ul>
+
+<pre><code class="language-xml">&lt;!-- 字符编码过滤器 --&gt;
+&lt;filter&gt;
+    &lt;filter-name&gt;encoding&lt;/filter-name&gt;
+    &lt;filter-class&gt;org.springframework.web.filter.CharacterEncodingFilter&lt;/filter-class&gt;
+    &lt;init-param&gt;
+        &lt;param-name&gt;encoding&lt;/param-name&gt;
+        &lt;param-value&gt;utf-8&lt;/param-value&gt;
+    &lt;/init-param&gt;
+&lt;/filter&gt;
+&lt;filter-mapping&gt;
+    &lt;filter-name&gt;encoding&lt;/filter-name&gt;
+    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
+&lt;/filter-mapping&gt;
+</code></pre>
+
+<p>JSP中</p>
+
+<ul>
+<li><p>pageEncoding=&ldquo;UTF-8&rdquo; 的作用是设置JSP编译成Servlet时使用的编码。</p></li>
+
+<li><p>contentType=&ldquo;text/html;charset=UTF-8&rdquo;的作用是指定服务器响应给浏览器的编码。</p></li>
+</ul>
+
+<h1 id="四-传参">四、传参</h1>
+
+<p>把内容写到方法(HandlerMethod)参数中，SpringMVC只要有这个内容，注入内容</p>
+
+<h2 id="1-基本数据类型参数">1. 基本数据类型参数</h2>
+
+<ul>
+<li>默认保证参数名和请求的参数名一致</li>
+</ul>
+
+<pre><code class="language-java">@RequestMapping(&quot;demo&quot;)
+public String demo(String name, int age) {
+    System.out.println(&quot;demo, name:&quot; + name + &quot;age:&quot; + age);
+    return &quot;main.jsp&quot;;
+}
+</code></pre>
+
+<ul>
+<li>如果请求参数名和方法参数名不对应使用@RequestParam()赋值</li>
+</ul>
+
+<pre><code class="language-java">@RequestMapping(&quot;demo&quot;)
+public String demo(@RequestParam(value = &quot;name1&quot;)String name, @RequestParam(value = &quot;age1&quot;)int age) {
+    System.out.println(&quot;demo, name:&quot; + name + &quot;age:&quot; + age);
+     return &quot;main.jsp&quot;;
+}
+</code></pre>
+
+<ul>
+<li>如果方法参数类型是基本数据类型(不是封装类)，可以通过@RequestParam()设置默认值
+
+<ul>
+<li>防止没有参数时，500错误</li>
+</ul></li>
+</ul>
+
+<pre><code class="language-java">@RequestMapping(&quot;page&quot;)
+public String page(@RequestParam(defaultValue = &quot;2&quot;)int pageSize, @RequestParam(defaultValue = &quot;1&quot;)int pageNumber) {
+    System.out.println(&quot;pageSize:&quot; + pageSize + &quot;, pageNumber:&quot; + pageNumber);
+    return &quot;main.jsp&quot;;
+}
+</code></pre>
+
+<ul>
+<li>如果强制要求必须有某个参数</li>
+</ul>
+
+<pre><code class="language-java">@RequestMapping(&quot;demo&quot;)
+public String demo(@RequestParam(required = true)String name) {
+    System.out.println(&quot;demo name必填&quot;);
+    return &quot;main.jsp&quot;;
+}
+</code></pre>
+
+<h2 id="2-参数是对象类型">2. 参数是对象类型</h2>
+
+<p>请求参数名和对象中属性名对应(get/set方法)</p>
+
+<pre><code class="language-java">@RequestMapping(&quot;demo&quot;)
+public String demo(People peo) {
+    System.out.println(&quot;name:&quot; + peo.getName() + &quot;, age:&quot; + peo.getAge());
+    return &quot;main.jsp&quot;;
+}
+</code></pre>
+
+<h2 id="3-请求参数中包含多个同名参数的获取方式">3. 请求参数中包含多个同名参数的获取方式</h2>
+
+<ul>
+<li>复选框的参数就是多个同名参数</li>
+</ul>
+
+<pre><code class="language-java">@RequestMapping(&quot;demo&quot;)
+public String demo(String name, int age, @RequestParam(&quot;hover&quot;) List&lt;String&gt; hover) {
+    System.out.println(&quot;name:&quot; + name + &quot;, age:&quot; +age + &quot;, hover:&quot; + hover);
+    return &quot;main.jsp&quot;;
+}
+</code></pre>
+
+<h2 id="4-请求参数中对象-属性格式">4. 请求参数中对象.属性格式</h2>
+
+<ul>
+<li>jsp代码</li>
+</ul>
+
+<pre><code class="language-html">&lt;input type=&quot;text&quot; name=&quot;peo.name&quot;/&gt;
+&lt;input type=&quot;text&quot; name=&quot;peo.age&quot;/&gt;
+</code></pre>
+
+<ul>
+<li>新建一个参数，对象名和参数中点前面名称对应</li>
+</ul>
+
+<pre><code class="language-java">public class Demo{
+	private People peo;
+}
+</code></pre>
+
+<ul>
+<li>控制器</li>
+</ul>
+
+<pre><code class="language-java">@RequestMapping(&quot;demo&quot;)
+public String demo(Demo demo) {
+    System.out.println(demo);
+    return &quot;main.jsp&quot;;
+}
+</code></pre>
+
+<h2 id="5-在请求参数中传递集合对象类型参数">5. 在请求参数中传递集合对象类型参数</h2>
+
+<ul>
+<li>jsp代码</li>
+</ul>
+
+<pre><code class="language-html">&lt;input type=&quot;text&quot; name=&quot;peo[0].name&quot;/&gt;
+&lt;input type=&quot;text&quot; name=&quot;peo[0].age&quot;/&gt;
+&lt;input type=&quot;text&quot; name=&quot;peo[1].name&quot;/&gt;
+&lt;input type=&quot;text&quot; name=&quot;peo[1].age&quot;/&gt;
+</code></pre>
+
+<ul>
+<li>新建类</li>
+</ul>
+
+<pre><code class="language-java">public class Demo{
+	private List&lt;People&gt; peo;
+}
+</code></pre>
+
+<ul>
+<li>控制器</li>
+</ul>
+
+<pre><code class="language-java">@RequestMapping(&quot;demo&quot;)
+public String demo(Demo demo) {
+    System.out.println(demo);
+    return &quot;main.jsp&quot;;
+}
+</code></pre>
+
+<h2 id="6-restful传值方式">6. restful传值方式</h2>
+
+<p>简化jsp中参数编写格式</p>
+
+<ul>
+<li>在jsp中设置特定的格式</li>
+</ul>
+
+<pre><code class="language-html">&lt;a href=&quot;demo/123/abc&quot;&gt;跳转&lt;/a&gt;
+</code></pre>
+
+<ul>
+<li>控制器中
+
+<ul>
+<li>在@RequestMapping中一定要和请求格式对应</li>
+<li>{名称}中名称自定义</li>
+<li>@PathVariable获取@RequestMapping中内容，默认按照方法参数名去寻找</li>
+</ul></li>
+</ul>
+
+<pre><code class="language-java">@RequestMapping(&quot;demo/{id1}/{name}&quot;)
+public String demo(@PathVariable(&quot;id1&quot;)int age, @PathVariable String name) {
+    System.out.println(&quot;age:&quot; + age + &quot;name:&quot; + name);
+    return &quot;/main.jsp&quot;;
+}
+</code></pre>
+
+<h1 id="五-跳转方式">五、跳转方式</h1>
+
+<p>默认跳转方式是转发</p>
+
+<h2 id="设置返回字符串内容">设置返回字符串内容</h2>
+
+<ul>
+<li>添加<code>redirect:资源路径</code>表示重定向</li>
+<li>添加<code>forward:资源路径</code>或省略<code>forward:</code>表示转发</li>
+</ul>
+
+<h1 id="六-视图解析器">六、视图解析器</h1>
+
+<p>SpringMVC会提供默认视图解析器</p>
+
+<h2 id="自定义视图解析器">自定义视图解析器</h2>
+
+<pre><code class="language-xml">&lt;bean id=&quot;viewResolver&quot; class=&quot;org.springframework.web.servlet.view.InternalResourceViewResolver&quot;&gt;
+    &lt;property name=&quot;prefix&quot; value=&quot;/&quot;&gt;&lt;/property&gt;
+    &lt;property name=&quot;suffix&quot; value=&quot;.jsp&quot;&gt;&lt;/property&gt;
+&lt;/bean&gt;
+</code></pre>
+
+<ul>
+<li>希望不执行自定义解析器，在方法返回值前面添加<code>forward:</code>或<code>redirect:</code></li>
+</ul>
+
+<pre><code class="language-java">@RequestMapping(&quot;demo10&quot;)
+public String demo10() {
+	return &quot;forward:demo11&quot;;
+}
+
+@RequestMapping(&quot;demo11&quot;)
+public String demo11() {
+	System.out.println(&quot;demo11&quot;);
+	return &quot;main&quot;;
+}
+</code></pre>
+
+<h1 id="七-responsebody">七、@ResponseBody</h1>
+
+<p>在方法上只有@RequestMapping时，无论方法返回值是什么认为需要跳转</p>
+
+<p>在方法添加@ResponseBody(<font color="red">始终不会跳转</font>)</p>
+
+<ul>
+<li>如果返回值满足key-value形式(对象或map)
+
+<ul>
+<li>把响应头设置为application/json;charset=&ldquo;utf-8&rdquo;</li>
+<li>把转换后的内容以输出流的形式返回给客户端</li>
+</ul></li>
+<li>如果返回值不满足key-value形式(String)
+
+<ul>
+<li>把响应头设置为text/html</li>
+<li>把返回值以流的形式直接输出</li>
+<li>如果返回出现中文，出现乱码</li>
+<li>produces表示响应头中Content-Type的取值</li>
+</ul></li>
+</ul>
+
+<pre><code class="language-java">@RequestMapping(value = &quot;demo12&quot;,produces = &quot;text/html;charset=utf-8&quot;)
+@ResponseBody
+public String demo12() {
+    People peo = new People();
+    peo.setName(&quot;张三&quot;);
+    peo.setAge(12);
+    return &quot;测试中文是否乱码？&quot;;
+}
+</code></pre>
+
+<h1 id="八-九大内置对象和四大作用域">八、九大内置对象和四大作用域</h1>
+
+<h2 id="九大内置对象">九大内置对象</h2>
+
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>含义</th>
+<th>获取方式</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>request</td>
+<td>HttpServletRequest</td>
+<td>封装所有请求信息</td>
+<td>方法参数</td>
+</tr>
+
+<tr>
+<td>response</td>
+<td>HttpServletResponse</td>
+<td>封装所有响应信息</td>
+<td>方法参数</td>
+</tr>
+
+<tr>
+<td>session</td>
+<td>HttpSession</td>
+<td>封装所有会话信息</td>
+<td>req.getSession()</td>
+</tr>
+
+<tr>
+<td>application</td>
+<td>ServletContext</td>
+<td>所有信息</td>
+<td>getServletContext();request.getServletContext();</td>
+</tr>
+
+<tr>
+<td>out</td>
+<td>PrintWriter</td>
+<td>输出对象</td>
+<td>response.getWriter();</td>
+</tr>
+
+<tr>
+<td>exception</td>
+<td>Exception</td>
+<td>异常对象</td>
+<td></td>
+</tr>
+
+<tr>
+<td>page</td>
+<td>Object</td>
+<td>当前异常对象</td>
+<td></td>
+</tr>
+
+<tr>
+<td>pageContext</td>
+<td>PageContext</td>
+<td>获取其他对象</td>
+<td></td>
+</tr>
+
+<tr>
+<td>config</td>
+<td>ServletConfig</td>
+<td>配置信息</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="四大作用域">四大作用域</h2>
+
+<ul>
+<li><p>page，当前页面不会重新实例化</p></li>
+
+<li><p>request，在一次请求中同一个对象，下次请求重新实例化一个request对象</p></li>
+
+<li><p>session，一次会话，只要客户端Cookie传递的Jsessionid不变，Session不会重新实例化(不超过默认时间)</p>
+
+<ul>
+<li>实际有效时间
+
+<ul>
+<li>浏览器关闭Cookie失效</li>
+<li>默认时间，在时间范围内无任何交互，在Tomcat的web.xml配置</li>
+</ul></li>
+</ul></li>
+</ul>
+
+<pre><code class="language-xml">&lt;session-config&gt;
+	&lt;session-timeout&gt;30&lt;session-timeout/&gt;
+&lt;session-config/&gt;
+</code></pre>
+
+<ul>
+<li>application，只有在Tomcat启动时才实例化，关闭Tomcat销毁application</li>
+</ul>
+
+<h1 id="十-springmvc中作用域传值的几种方式">十、SpringMVC中作用域传值的几种方式</h1>
+
+<h2 id="使用原生servlet">使用原生Servlet</h2>
+
+<p>在HandlerMethod参数中添加作用域对象</p>
+
+<pre><code class="language-java">@RequestMapping(&quot;demo1&quot;)
+public String demo1(HttpServletRequest req, HttpSession sessionParam) {
+
+    // request作用域
+    req.setAttribute(&quot;req&quot;, &quot;request的值&quot;);
+
+    // session作用域
+    HttpSession session = req.getSession();
+    session.setAttribute(&quot;session&quot;, &quot;session的值&quot;);
+    sessionParam.setAttribute(&quot;sessionParam&quot;, &quot;sessionParam的值&quot;);
+
+    // application作用域
+    ServletContext application = req.getServletContext();
+    application.setAttribute(&quot;application&quot;, &quot;application的值&quot;);
+    return &quot;/index.jsp&quot;;
+}
+</code></pre>
+
+<h2 id="使用map集合">使用Map集合</h2>
+
+<ol>
+<li><p>把Map中内容放在request作用域中</p></li>
+
+<li><p>spring会对map集合通过BindingAwareModelMap进行实例化</p></li>
+</ol>
+
+<pre><code class="language-java">@RequestMapping(&quot;demo2&quot;)
+public String demo2(Map&lt;String, Object&gt; map) {
+    map.put(&quot;map&quot;, &quot;map的值&quot;);
+    return &quot;/index.jsp&quot;;
+}
+</code></pre>
+
+<h2 id="使用spingmvc中model接口">使用SpingMVC中Model接口</h2>
+
+<p>把内容最终放到request作用域中</p>
+
+<pre><code class="language-java">@RequestMapping(&quot;demo3&quot;)
+public String demo3(Model model) {
+    model.addAttribute(&quot;model&quot;, &quot;model的值&quot;);
+    return &quot;/index.jsp&quot;;
+}
+</code></pre>
+
+<h2 id="使用springmvc中modelandview类">使用SpringMVC中ModelAndView类</h2>
+
+<pre><code class="language-java">@RequestMapping(&quot;demo4&quot;)
+public ModelAndView demo4() {
+    ModelAndView mav = new ModelAndView(&quot;/index.jsp&quot;);
+    mav.addObject(&quot;mav&quot;, &quot;mav的值&quot;);
+    return mav;
+}
+</code></pre>
+
+<h1 id="十一-文件下载">十一、文件下载</h1>
+
+<p>访问资源时响应头如果没有设置<code>Content-Disposition</code>，浏览器默认按照<code>inline</code>值进行处理</p>
+
+<ul>
+<li>inline，能显示就显示，不能显示就下载</li>
+</ul>
+
+<p>只需修改响应头中<code>Content-Disposition=&quot;attachment;filename=文件名&quot;</code></p>
+
+<ul>
+<li>attachment下载，以附件形式下载</li>
+<li>filename=值，就是下载时显示的下载文件名</li>
+</ul>
+
+<h2 id="实现步骤">实现步骤</h2>
+
+<ol>
+<li>导入apache的两个jar</li>
+</ol>
+
+<ul>
+<li>commons-fileupload-1.3.1.jar</li>
+<li>commons-io-2.2.jar</li>
+</ul>
+
+<ol>
+<li>在jsp中添加超链接设置需要下载的文件</li>
+</ol>
+
+<ul>
+<li>在SpringMVC中放行静态资源文件files文件夹</li>
+</ul>
+
+<pre><code class="language-html">&lt;a href=&quot;download?fileName=a.txt&quot;&gt;下载&lt;/a&gt;
+</code></pre>
+
+<ol>
+<li>编写控制器</li>
+</ol>
+
+<pre><code class="language-java">@RequestMapping(&quot;download&quot;)
+public void download(HttpServletRequest req, HttpServletResponse res, String fileName) throws IOException {
+
+    // 设置响应流中文件进行下载
+    res.setHeader(&quot;Content-Disposition&quot;, &quot;attachment;filename=bbbb.txt&quot;);
+
+    // 把二进制流放入响应体中
+    ServletOutputStream os = res.getOutputStream();
+
+    String path = req.getServletContext().getRealPath(&quot;files&quot;);
+
+    File file = new File(path, fileName);
+    byte[] bytes = FileUtils.readFileToByteArray(file);
+
+    os.write(bytes);
+    os.flush();
+    os.close();
+}
+</code></pre>
+
+<h1 id="十二-文件上传">十二、文件上传</h1>
+
+<p>基于apache的commons-fileupload.jar完成文件上传。</p>
+
+<h2 id="multipartresolver作用">MultipartResolver作用</h2>
+
+<ul>
+<li>把客户端上传的文件流转换成MultipartFile封装类</li>
+<li>通过MultipartFile封装类获取到文件流</li>
+</ul>
+
+<h2 id="表单数据类型分类">表单数据类型分类</h2>
+
+<ul>
+<li>在<code>&lt;form&gt;</code>的<code>enctype</code>的属性控制表单类型
+
+<ul>
+<li>默认值<code>application/x-www-form-urlencoded</code>，普通表单数据(少量文字信息)</li>
+<li><code>text/pain</code>，大量文字信息时使用的类型，邮件、论文。</li>
+<li>multipart/form-data，表单中包含二进制文件内容</li>
+</ul></li>
+</ul>
+
+<h2 id="实现步骤-1">实现步骤</h2>
+
+<ol>
+<li><p>导入springmvc包和apache文件上传 commons-fileupload.jar和commons-io.jar</p></li>
+
+<li><p>编写jsp页面</p></li>
+</ol>
+
+<pre><code class="language-html">&lt;form action=&quot;upload&quot; enctype=&quot;multipart/form-data&quot; method=&quot;post&quot;&gt;
+    名称&lt;input type=&quot;text&quot; name=&quot;name&quot;&gt;
+	文件&lt;input type=&quot;file&quot; name=&quot;file&quot;&gt;
+	&lt;input type=&quot;submit&quot;&gt;
+&lt;/form&gt;
+</code></pre>
+
+<ol>
+<li>配置springmvc.xml</li>
+</ol>
+
+<pre><code class="language-xml">&lt;!-- MultipartResolver解析器 --&gt;
+&lt;bean id=&quot;multipartResolver&quot; class=&quot;org.springframework.web.multipart.commons.CommonsMultipartResolver&quot;&gt;
+    &lt;property name=&quot;maxUploadSize&quot; value=&quot;50&quot;&gt;&lt;/property&gt;
+&lt;/bean&gt;
+        
+&lt;!-- 异常解析器 --&gt;
+&lt;bean id=&quot;exceptionResolver&quot; class=&quot;org.springframework.web.servlet.handler.SimpleMappingExceptionResolver&quot;&gt;
+    &lt;property name=&quot;exceptionMappings&quot;&gt;
+        &lt;props&gt;	
+            &lt;prop key=&quot;org.springframework.web.multipart.MaxUploadSizeExceededException&quot;&gt;error.jsp&lt;/prop&gt;
+        &lt;/props&gt;
+    &lt;/property&gt;
+&lt;/bean&gt;
+</code></pre>
+
+<ol>
+<li>编写控制器类</li>
+</ol>
+
+<ul>
+<li>MultipartFile对象名必须和<code>&lt;input type=&quot;file&quot; name=&quot;file&quot;&gt;</code>的name属性值一致</li>
+</ul>
+
+<pre><code class="language-java">@RequestMapping(&quot;upload&quot;)
+public String upload(MultipartFile file, String name) throws IOException {
+    String fileName = file.getOriginalFilename();
+    String suffix = fileName.substring(fileName.lastIndexOf(&quot;.&quot;));
+    String uuid = UUID.randomUUID().toString();
+    FileUtils.copyInputStreamToFile(file.getInputStream(), new File(&quot;E:/&quot; + uuid + suffix));
+    return &quot;/index.jsp&quot;;
+}
+</code></pre>
+
+<h1 id="十三-自定义拦截器">十三、自定义拦截器</h1>
+
+<p>比较像过滤器的技术，发送请求时被拦截器拦截，在控制器前后添加功能</p>
+
+<ul>
+<li>和AOP区分开，AOP在特定方法前后扩充(对ServiceImpl)</li>
+<li>拦截器，请求的拦截，针对的是控制器方法(对Controller)</li>
+</ul>
+
+<h2 id="springmvc拦截器和filter区别">SpringMVC拦截器和Filter区别</h2>
+
+<ul>
+<li>连接器只能拦截Controller(静态资源被放行、jsp不走控制器)</li>
+<li>Filter可以拦截任何请求</li>
+</ul>
+
+<h2 id="实现自定义拦截器的步骤">实现自定义拦截器的步骤</h2>
+
+<ol>
+<li>新建类实现HandlerInterceptor</li>
+</ol>
+
+<pre><code class="language-java">public class DemoInterceptor implements HandlerInterceptor{
+
+	// 在进入控制器之前执行
+	// 如果返回值为false,阻止进入控制器
+	// 控制代码
+	@Override
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+			throws Exception {
+		System.out.println(&quot;handler:&quot; + handler);
+		System.out.println(&quot;preHandle&quot;);
+		return true;
+	}
+
+	// 在控制器执行完成,进入到jsp之前执行
+	// 日志记录
+	// 敏感词过滤
+	@Override
+	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
+			ModelAndView modelAndView) throws Exception {
+		
+		System.out.println(&quot;往&quot;+ modelAndView.getViewName() + &quot;跳转&quot;);
+		System.out.println(&quot;model的值&quot; + modelAndView.getModel().get(&quot;model&quot;));
+		String word = modelAndView.getModel().get(&quot;model&quot;).toString();
+		String newWord = word.replace(&quot;祖国&quot;, &quot;**&quot;);
+		modelAndView.getModel().put(&quot;model&quot;, newWord);
+		System.out.println(&quot;postHandle&quot;);
+	}
+
+	// jsp执行完成之后执行
+	// 日志记录过程中是否出现异常
+	// 可以把异常记录到日志中
+	@Override
+	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
+			throws Exception {
+		System.out.println(&quot;afterCompletion&quot; +ex.getMessage());
+	}
+
+}
+</code></pre>
+
+<ol>
+<li>在<code>springmvc.xml</code>配置拦截器需要拦截哪些控制器</li>
+</ol>
+
+<ul>
+<li>拦截所有控制器</li>
+</ul>
+
+<pre><code class="language-xml">&lt;mvc:interceptors&gt;
+    &lt;bean class=&quot;com.sugar.interceptor.DemoInterceptor&quot;&gt;&lt;/bean&gt;
+&lt;/mvc:interceptors&gt;
+</code></pre>
+
+<ul>
+<li>拦截特定的url</li>
+</ul>
+
+<pre><code class="language-xml">&lt;mvc:interceptors&gt;
+    &lt;mvc:interceptor&gt;
+        &lt;mvc:mapping path=&quot;/demo1&quot;/&gt;
+        &lt;mvc:mapping path=&quot;/demo2&quot;/&gt;
+        &lt;mvc:mapping path=&quot;/demo3&quot;/&gt;
+        &lt;bean class=&quot;com.sugar.DemoInterceptor&quot;&gt;&lt;/bean&gt;
+    &lt;/mvc:interceptor&gt;
+&lt;/mvc:interceptors&gt;
+</code></pre>
+
+<h2 id="拦截器栈">拦截器栈</h2>
+
+<p>多个拦截器同时生效时，组成了拦截器栈，先进后出的顺序</p>
+
+<p>执行顺序和<code>springmvc.xml</code>中配置顺序有关</p>
+
+<p>设置先配置拦截器A在配置拦截器B执行顺序为</p>
+
+<p>preHandle(A) $\rightarrow$ preHandle(B) $\rightarrow$ 控制器方法 $\rightarrow$ postHandle(B) $\rightarrow$ postHandle(A) $\rightarrow$ JSP $\rightarrow$ afterCompletion(B) $\rightarrow$ afterCompletion(A)</p>
+
+<h1 id="十四-springmvc运行原理">十四、SpringMVC运行原理</h1>
+
+<p>如果在<code>web.xml</code>中设置DispatcherServlet。的<code>&lt;url-pattern&gt;</code>为<code>/</code>时，当用户发起请求，请求一个控制器时，会执行<code>DispatcherServlet</code>。由<code>DispatcherServlet</code>调用<code>HandlerMapping</code>的<code>DefaultAnnotationHandlerMapping</code>解析URL，解析后调用<code>HandlerAdatper</code>组件的<code>AnnotationMethodHandlerAdapter</code>调用<code>Controller</code>的<code>HandlerMethod</code>。当<code>HandlerMethod</code>执行完成后会返回View，会被<code>ViewResovler</code>进行视图解析，解析后执行对应的jsp的<code>.class</code>文件并运行，最终把<code>.class</code>文件的结果响应给客户端。以上就是SpringMVC的运行原理。</p>
+
+        </div>
+        <footer class="article-footer">
+    <a data-url="https://sugarstar88.github.io/2020/06/11/springmvc/" data-id="b95fa3a852a2e71eb6921a51e789ab4f" class="article-share-link">
+        <i class="fa fa-share"></i>
+        分享
+    </a>
+    
+    <a href="https://sugarstar88.github.io/2020/06/11/springmvc/#disqus_thread" class="article-comment-link">
+        评论
+    </a>
+    
+
+    <script>
+    (function ($) {
+        
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+    </script>
+</footer>
+
+    </div>
+
+    
+<nav id="article-nav">
+    
+    <a href="https://sugarstar88.github.io/2020/06/11/spring/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">
+          下一篇
+      </strong>
+      <div class="article-nav-title">Spring</div>
+    </a>
+    
+
+    
+    <a href="https://sugarstar88.github.io/2020/06/11/mybatis/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">
+          上一篇
+      </strong>
+      <div class="article-nav-title">MyBatis</div>
+    </a>
+    
+</nav>
+
+
+</article>
+
+
+<section id="comments">
+    <div id="disqus_thread">
+        <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "spf13" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+</section>
+
+
+    </section>
+
+   	
+    	<aside id="sidebar">
+    
+<div class="widget-wrap">
+    <h3 class="widget-title">
+        最新文章
+    </h3>
+    <div class="widget">
+        <ul id="recent-post">
+            
+            <li>
+                <div class="item-thumbnail">
+                    <a href="https://sugarstar88.github.io/2020/06/11/mybatis/" class="thumbnail">
+                    
+                        <span class="thumbnail-image thumbnail-none"></span>
+                    
+                    </a>
+                </div>
+                <div class="item-inner">
+                    
+                    <p class="item-title"><a href="https://sugarstar88.github.io/2020/06/11/mybatis/" class="title">MyBatis</a></p>
+                    <p class="item-date">
+                        <time datetime="2020-06-11 15:30:12 &#43;0800 CST" itemprop="datePublished">2020-06-11</time>
+                    </p>
+                </div>
+            </li>
+            
+            <li>
+                <div class="item-thumbnail">
+                    <a href="https://sugarstar88.github.io/2020/06/11/springmvc/" class="thumbnail">
+                    
+                        <span class="thumbnail-image thumbnail-none"></span>
+                    
+                    </a>
+                </div>
+                <div class="item-inner">
+                    
+                    <p class="item-title"><a href="https://sugarstar88.github.io/2020/06/11/springmvc/" class="title">SpringMVC</a></p>
+                    <p class="item-date">
+                        <time datetime="2020-06-11 15:29:12 &#43;0800 CST" itemprop="datePublished">2020-06-11</time>
+                    </p>
+                </div>
+            </li>
+            
+            <li>
+                <div class="item-thumbnail">
+                    <a href="https://sugarstar88.github.io/2020/06/11/spring/" class="thumbnail">
+                    
+                        <span class="thumbnail-image thumbnail-none"></span>
+                    
+                    </a>
+                </div>
+                <div class="item-inner">
+                    
+                    <p class="item-title"><a href="https://sugarstar88.github.io/2020/06/11/spring/" class="title">Spring</a></p>
+                    <p class="item-date">
+                        <time datetime="2020-06-11 15:17:12 &#43;0800 CST" itemprop="datePublished">2020-06-11</time>
+                    </p>
+                </div>
+            </li>
+            
+        </ul>
+    </div>
+</div>
+
+
+    
+
+
+
+
+
+    
+
+
+
+
+
+    
+
+
+
+
+
+
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+
+    
+	</div>
+</div>
+
+<footer id="footer">
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020
+      Powered by <a href="https://github.com/SugarStars">SugarStar</a>.
+    </div>
+  </div>
+</footer>
+
+
+<script src="https://sugarstar88.github.io/fancybox/jquery.fancybox.pack.js"></script>
+<script src="https://sugarstar88.github.io/js/script.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js"></script>
+
+
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']]}
+  });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+
+
+</body>
+</html>

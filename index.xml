@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>SugarStar</title>
+    <link>https://sugarstar88.github.io/</link>
+    <description>Recent content on SugarStar</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Thu, 11 Jun 2020 15:30:12 +0800</lastBuildDate>
+    
+	<atom:link href="https://sugarstar88.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>MyBatis</title>
+      <link>https://sugarstar88.github.io/2020/06/11/mybatis/</link>
+      <pubDate>Thu, 11 Jun 2020 15:30:12 +0800</pubDate>
+      
+      <guid>https://sugarstar88.github.io/2020/06/11/mybatis/</guid>
+      <description>一、简介 MyBatis开源免费框架，原名iBatis，2010年在google，2013年迁移到github
+作用 数据访问层框架，底层是对jdbc的封装
+MyBatis优点之一 使用MyBatis时，不需要编写实现类，只需要编写执行的sql命令
+二、环境搭建 1. 导入jar  asm-3.3.1.jar cglib-2.2.2.jar commons-logging-1.1.1.jar javassist-3.17.1-GA.jar log4j-1.2.17.jar log4j-api-2.0-rc1.jar log4j-core-2.0-rc1.jar mybatis-3.2.7.jar ojdbc14-10.2.0.1.0.jar slf4j-api-1.7.5.jar slf4j-log4j12-1.7.5.jar  2. 在src下新建全局配置文件(编写JDBC四个变量)  没有名称和地址要求 在全局配置文件中引入DTD或Schema
+ 若导入DTD后没有提示，Window-&amp;gt;preference-&amp;gt;XML-&amp;gt;XML catalog-&amp;gt;add   全局配置文件内容
+  &amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt; &amp;lt;!DOCTYPE configuration PUBLIC &amp;quot;-//mybatis.org//DTD Config 3.0//EN&amp;quot; &amp;quot;http://mybatis.org/dtd/mybatis-3-config.dtd&amp;quot;&amp;gt; &amp;lt;configuration&amp;gt; &amp;lt;!-- default引用 environment的id, 当前所使用的环境--&amp;gt; &amp;lt;environments default=&amp;quot;oracle&amp;quot;&amp;gt; &amp;lt;!-- 声明可以使用的环境 --&amp;gt; &amp;lt;environment id=&amp;quot;oracle&amp;quot;&amp;gt; &amp;lt;!-- 使用原生jdbc事务 --&amp;gt; &amp;lt;transactionManager type=&amp;quot;JDBC&amp;quot;&amp;gt;&amp;lt;/transactionManager&amp;gt; &amp;lt;dataSource type=&amp;quot;POOLED&amp;quot;&amp;gt; &amp;lt;property name=&amp;quot;driver&amp;quot; value=&amp;quot;oracle.jdbc.driver.OracleDriver&amp;quot;/&amp;gt; &amp;lt;property name=&amp;quot;url&amp;quot; value=&amp;quot;jdbc:oracle:thin:@localhost:1521:orcl&amp;quot;/&amp;gt; &amp;lt;property name=&amp;quot;username&amp;quot; value=&amp;quot;TX_USER&amp;quot;/&amp;gt; &amp;lt;property name=&amp;quot;password&amp;quot; value=&amp;quot;TX_USER&amp;quot;/&amp;gt; &amp;lt;/dataSource&amp;gt; &amp;lt;/environment&amp;gt; &amp;lt;/environments&amp;gt; &amp;lt;mappers&amp;gt; &amp;lt;mapper resource=&amp;quot;com/sugar/mapper/FlowerMapper.</description>
+    </item>
+    
+    <item>
+      <title>SpringMVC</title>
+      <link>https://sugarstar88.github.io/2020/06/11/springmvc/</link>
+      <pubDate>Thu, 11 Jun 2020 15:29:12 +0800</pubDate>
+      
+      <guid>https://sugarstar88.github.io/2020/06/11/springmvc/</guid>
+      <description>一、简介 SpringMVC重要组件  DispatcherServlet，前段控制器，接受所有请求（如果配置/不包含jsp） HandlerMapping，解析请求格式，判断希望执行哪个具体的方法 HandlerAdapter，负责调用具体的方法 ViewResolver，视图解析器，解析结果，准备跳转到具体的物理视图  运行原理 Spring容器和和SpringMVC容器的关系  SpringMVC容器中能够调用Spring容器中的所有内容
+ 父子容器
+  二、SpringMVC环境搭建 1. 导入jar包  commons-logging-1.1.3.jar spring-aop-4.1.6.RELEASE.jar spring-aspects-4.1.6.RELEASE.jar spring-beans-4.1.6.RELEASE.jar spring-context-4.1.6.RELEASE.jar spring-core-4.1.6.RELEASE.jar spring-expression-4.1.6.RELEASE.jar spring-jdbc-4.1.6.RELEASE.jar spring-tx-4.1.6.RELEASE.jar spring-web-4.1.6.RELEASE.jar spring-webmvc-4.1.6.RELEASE.jar  2. 在web.xml中配置前端控制器  如果不配置&amp;lt;init-param/&amp;gt;会在/WEB-INF/&amp;lt;servlet-name&amp;gt;-servlet.xml  &amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt; &amp;lt;web-app xmlns:xsi=&amp;quot;http://www.w3.org/2001/XMLSchema-instance&amp;quot; xmlns=&amp;quot;http://java.sun.com/xml/ns/javaee&amp;quot; xsi:schemaLocation=&amp;quot;http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd&amp;quot; id=&amp;quot;WebApp_ID&amp;quot; version=&amp;quot;3.0&amp;quot;&amp;gt; &amp;lt;!-- 配置前端控制器 --&amp;gt; &amp;lt;servlet&amp;gt; &amp;lt;servlet-name&amp;gt;dispatcherServlet&amp;lt;/servlet-name&amp;gt; &amp;lt;servlet-class&amp;gt;org.springframework.web.servlet.DispatcherServlet&amp;lt;/servlet-class&amp;gt; &amp;lt;init-param&amp;gt; &amp;lt;param-name&amp;gt;contextConfigLocation&amp;lt;/param-name&amp;gt; &amp;lt;param-value&amp;gt;classpath:springmvc.xml&amp;lt;/param-value&amp;gt; &amp;lt;/init-param&amp;gt; &amp;lt;load-on-startup&amp;gt;1&amp;lt;/load-on-startup&amp;gt; &amp;lt;/servlet&amp;gt; &amp;lt;servlet-mapping&amp;gt; &amp;lt;servlet-name&amp;gt;dispatcherServlet&amp;lt;/servlet-name&amp;gt; &amp;lt;url-pattern&amp;gt;/&amp;lt;/url-pattern&amp;gt; &amp;lt;/servlet-mapping&amp;gt; &amp;lt;/web-app&amp;gt;  &amp;lt; url-pattern &amp;gt; / &amp;lt;/ url-pattern &amp;gt; 不会匹配到*.</description>
+    </item>
+    
+    <item>
+      <title>Spring</title>
+      <link>https://sugarstar88.github.io/2020/06/11/spring/</link>
+      <pubDate>Thu, 11 Jun 2020 15:17:12 +0800</pubDate>
+      
+      <guid>https://sugarstar88.github.io/2020/06/11/spring/</guid>
+      <description>一、简介 主要发明者 RodJohnson
+轮子理论推崇者 轮子理论：不要重复造轮子 IT行业：直接使用写好的代码
+Spring框架宗旨 不重新发明技术，让原有技术使用更加方便
+Spring几大核心功能  IoC/DI 控制翻转/依赖注入
+ AOP 面向切面编程
+ 声明式事务
+  Spring框架的runtime 1. Test Spring提供测试功能
+2. Core Container 核心容器Spring启动的最基本条件
+ Beans Spring 负责创建类对象并管理对象
+ Core 核心类
+ Context 上下文参数，获取外部资源或管理注解等
+ SpEL expression.jar
+  3. AOP 实现AOP需要依赖
+4. Aspects 切面AOP依赖的包
+5. Data Access/Intergration Spring封装数据访问层相关内容
+ JDBC Spring对JDBC封装后的代码 ORM 封装了持久层框架的代码，例如hibernate transactions 对应spring-tx.jar，声明式事务时使用  6. Web 需要Spring完成相关功能时
+ 由Tomcat加载Spring配置文件时，需要spring-web  Spring框架重要概念 1. 容器（Container） Spring当做一个容器</description>
+    </item>
+    
+  </channel>
+</rss>

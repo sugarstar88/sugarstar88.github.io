@@ -1,0 +1,1673 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <title>MyBatis &middot; SugarStar</title>
+    <meta name="generator" content="Hugo 0.55.5" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="author" content="SugarStar">
+    
+      <meta name="description" content="">
+    
+    
+    <link rel="canonical" href="https://sugarstar88.github.io/2020/06/11/mybatis/"/>
+    <link rel="icon" href="https://sugarstar88.github.io/favicon.ico">
+    <link rel="apple-touch-icon" href="https://sugarstar88.github.io/apple-touch-icon.png"/>
+    <link rel="stylesheet" href="https://sugarstar88.github.io/css/style.css">
+    <link rel="stylesheet" href="https://sugarstar88.github.io/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://sugarstar88.github.io/css/monokai.css">
+    <link rel="stylesheet" href="https://sugarstar88.github.io/fancybox/jquery.fancybox.css">
+    
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400italic,400,600' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Source+Code+Pro' rel='stylesheet' type='text/css'>
+    <meta property="og:title" content="MyBatis" />
+<meta property="og:description" content="一、简介 MyBatis开源免费框架，原名iBatis，2010年在google，2013年迁移到github
+作用 数据访问层框架，底层是对jdbc的封装
+MyBatis优点之一 使用MyBatis时，不需要编写实现类，只需要编写执行的sql命令
+二、环境搭建 1. 导入jar  asm-3.3.1.jar cglib-2.2.2.jar commons-logging-1.1.1.jar javassist-3.17.1-GA.jar log4j-1.2.17.jar log4j-api-2.0-rc1.jar log4j-core-2.0-rc1.jar mybatis-3.2.7.jar ojdbc14-10.2.0.1.0.jar slf4j-api-1.7.5.jar slf4j-log4j12-1.7.5.jar  2. 在src下新建全局配置文件(编写JDBC四个变量)  没有名称和地址要求 在全局配置文件中引入DTD或Schema
+ 若导入DTD后没有提示，Window-&gt;preference-&gt;XML-&gt;XML catalog-&gt;add   全局配置文件内容
+  &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt; &lt;!DOCTYPE configuration PUBLIC &quot;-//mybatis.org//DTD Config 3.0//EN&quot; &quot;http://mybatis.org/dtd/mybatis-3-config.dtd&quot;&gt; &lt;configuration&gt; &lt;!-- default引用 environment的id, 当前所使用的环境--&gt; &lt;environments default=&quot;oracle&quot;&gt; &lt;!-- 声明可以使用的环境 --&gt; &lt;environment id=&quot;oracle&quot;&gt; &lt;!-- 使用原生jdbc事务 --&gt; &lt;transactionManager type=&quot;JDBC&quot;&gt;&lt;/transactionManager&gt; &lt;dataSource type=&quot;POOLED&quot;&gt; &lt;property name=&quot;driver&quot; value=&quot;oracle.jdbc.driver.OracleDriver&quot;/&gt; &lt;property name=&quot;url&quot; value=&quot;jdbc:oracle:thin:@localhost:1521:orcl&quot;/&gt; &lt;property name=&quot;username&quot; value=&quot;TX_USER&quot;/&gt; &lt;property name=&quot;password&quot; value=&quot;TX_USER&quot;/&gt; &lt;/dataSource&gt; &lt;/environment&gt; &lt;/environments&gt; &lt;mappers&gt; &lt;mapper resource=&quot;com/sugar/mapper/FlowerMapper." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://sugarstar88.github.io/2020/06/11/mybatis/" />
+<meta property="article:published_time" content="2020-06-11T15:30:12&#43;08:00"/>
+<meta property="article:modified_time" content="2020-06-11T15:30:12&#43;08:00"/>
+
+    
+    
+<meta itemprop="name" content="MyBatis">
+<meta itemprop="description" content="一、简介 MyBatis开源免费框架，原名iBatis，2010年在google，2013年迁移到github
+作用 数据访问层框架，底层是对jdbc的封装
+MyBatis优点之一 使用MyBatis时，不需要编写实现类，只需要编写执行的sql命令
+二、环境搭建 1. 导入jar  asm-3.3.1.jar cglib-2.2.2.jar commons-logging-1.1.1.jar javassist-3.17.1-GA.jar log4j-1.2.17.jar log4j-api-2.0-rc1.jar log4j-core-2.0-rc1.jar mybatis-3.2.7.jar ojdbc14-10.2.0.1.0.jar slf4j-api-1.7.5.jar slf4j-log4j12-1.7.5.jar  2. 在src下新建全局配置文件(编写JDBC四个变量)  没有名称和地址要求 在全局配置文件中引入DTD或Schema
+ 若导入DTD后没有提示，Window-&gt;preference-&gt;XML-&gt;XML catalog-&gt;add   全局配置文件内容
+  &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt; &lt;!DOCTYPE configuration PUBLIC &quot;-//mybatis.org//DTD Config 3.0//EN&quot; &quot;http://mybatis.org/dtd/mybatis-3-config.dtd&quot;&gt; &lt;configuration&gt; &lt;!-- default引用 environment的id, 当前所使用的环境--&gt; &lt;environments default=&quot;oracle&quot;&gt; &lt;!-- 声明可以使用的环境 --&gt; &lt;environment id=&quot;oracle&quot;&gt; &lt;!-- 使用原生jdbc事务 --&gt; &lt;transactionManager type=&quot;JDBC&quot;&gt;&lt;/transactionManager&gt; &lt;dataSource type=&quot;POOLED&quot;&gt; &lt;property name=&quot;driver&quot; value=&quot;oracle.jdbc.driver.OracleDriver&quot;/&gt; &lt;property name=&quot;url&quot; value=&quot;jdbc:oracle:thin:@localhost:1521:orcl&quot;/&gt; &lt;property name=&quot;username&quot; value=&quot;TX_USER&quot;/&gt; &lt;property name=&quot;password&quot; value=&quot;TX_USER&quot;/&gt; &lt;/dataSource&gt; &lt;/environment&gt; &lt;/environments&gt; &lt;mappers&gt; &lt;mapper resource=&quot;com/sugar/mapper/FlowerMapper.">
+
+
+<meta itemprop="datePublished" content="2020-06-11T15:30:12&#43;08:00" />
+<meta itemprop="dateModified" content="2020-06-11T15:30:12&#43;08:00" />
+<meta itemprop="wordCount" content="1157">
+
+
+
+<meta itemprop="keywords" content="" />
+
+    <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="MyBatis"/>
+<meta name="twitter:description" content="一、简介 MyBatis开源免费框架，原名iBatis，2010年在google，2013年迁移到github
+作用 数据访问层框架，底层是对jdbc的封装
+MyBatis优点之一 使用MyBatis时，不需要编写实现类，只需要编写执行的sql命令
+二、环境搭建 1. 导入jar  asm-3.3.1.jar cglib-2.2.2.jar commons-logging-1.1.1.jar javassist-3.17.1-GA.jar log4j-1.2.17.jar log4j-api-2.0-rc1.jar log4j-core-2.0-rc1.jar mybatis-3.2.7.jar ojdbc14-10.2.0.1.0.jar slf4j-api-1.7.5.jar slf4j-log4j12-1.7.5.jar  2. 在src下新建全局配置文件(编写JDBC四个变量)  没有名称和地址要求 在全局配置文件中引入DTD或Schema
+ 若导入DTD后没有提示，Window-&gt;preference-&gt;XML-&gt;XML catalog-&gt;add   全局配置文件内容
+  &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt; &lt;!DOCTYPE configuration PUBLIC &quot;-//mybatis.org//DTD Config 3.0//EN&quot; &quot;http://mybatis.org/dtd/mybatis-3-config.dtd&quot;&gt; &lt;configuration&gt; &lt;!-- default引用 environment的id, 当前所使用的环境--&gt; &lt;environments default=&quot;oracle&quot;&gt; &lt;!-- 声明可以使用的环境 --&gt; &lt;environment id=&quot;oracle&quot;&gt; &lt;!-- 使用原生jdbc事务 --&gt; &lt;transactionManager type=&quot;JDBC&quot;&gt;&lt;/transactionManager&gt; &lt;dataSource type=&quot;POOLED&quot;&gt; &lt;property name=&quot;driver&quot; value=&quot;oracle.jdbc.driver.OracleDriver&quot;/&gt; &lt;property name=&quot;url&quot; value=&quot;jdbc:oracle:thin:@localhost:1521:orcl&quot;/&gt; &lt;property name=&quot;username&quot; value=&quot;TX_USER&quot;/&gt; &lt;property name=&quot;password&quot; value=&quot;TX_USER&quot;/&gt; &lt;/dataSource&gt; &lt;/environment&gt; &lt;/environments&gt; &lt;mappers&gt; &lt;mapper resource=&quot;com/sugar/mapper/FlowerMapper."/>
+
+    
+
+    
+
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+</head>
+<body>
+<div class="container">
+
+
+<div id="container">
+	<header id="header">
+  <div id="header-main" class="header-inner">
+    <div class="outer">
+      <a href="https://sugarstar88.github.io/" id="logo">
+          
+          <i class="logo" style="background-image: url('https://sugarstar88.github.io/css/images/logo.png')"></i>
+          
+          <span class="site-title">SugarStar</span>
+      </a>
+      <nav id="main-nav">
+          
+          
+          <a class="main-nav-link" href="https://sugarstar88.github.io/">主页</a>
+          
+          
+          
+          
+          
+          
+
+          
+
+          
+          
+          
+          
+          <a class="main-nav-link" href="https://sugarstar88.github.io/tags/">标签</a>
+          
+          
+          
+          <a class="main-nav-link" href="https://sugarstar88.github.io/categories/">目录分类</a>
+          
+          
+      </nav>
+        <nav id="sub-nav">
+          <div class="profile" id="profile-nav">
+            <a id="profile-anchor" href="javascript:;"><img class="avatar" src="https://sugarstar88.github.io/css/images/SugarStar.jpg"><i class="fa fa-caret-down"></i></a>
+          </div>
+        </nav>
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form">
+              <input type="search" name="q" class="search-form-input" placeholder="搜索">
+              <button type="submit" class="search-form-submit">
+              </button>
+              <input type="hidden" name="sitesearch" value="https://sugarstar88.github.io/" />
+         </form>
+        </div>
+    </div>
+  </div>
+  <div id="main-nav-mobile" class="header-sub header-inner">
+    <table class="menu outer">
+      <tbody>
+          <tr>
+          
+          
+          <td><a class="main-nav-link" href="https://sugarstar88.github.io/">主页</a></td>
+          
+          
+          
+          
+          
+          
+
+          
+
+          
+          
+          
+          
+          <td><a class="main-nav-link" href="https://sugarstar88.github.io/tags/">标签</a></td>
+          
+          
+          
+          <td><a class="main-nav-link" href="https://sugarstar88.github.io/categories/">目录分类</a></td>
+          
+          
+          <td>
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form">
+          <input type="search" name="q" class="search-form-input" placeholder="Search">
+          <input type="hidden" name="sitesearch" value="https://sugarstar88.github.io/" />
+          </form>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</header>
+
+   	
+   	<div class="outer">
+   	
+    	<aside id="profile">
+  <div class="inner profile-inner">
+    <div class="base-info profile-block">
+      
+      <img id="avatar" src="https://sugarstar88.github.io/css/images/SugarStar.jpg">
+      
+      <h2 id="name">SugarStar</h2>
+      <h3 id="title">程序员</h3>
+      <span id="location"><i class="fa fa-map-marker"></i>江苏·南京</span>
+      
+          <a id="follow" href="https://github.com/SugarStars">
+              关注
+          </a>
+      
+    </div>
+    <div class="article-info profile-block">
+      <div class="article-info-block">
+        3
+        <span>文章</span>
+      </div>
+      <div class="article-info-block">
+        
+          0
+        
+        <span>
+            标签
+        </span>
+      </div>
+    </div>
+    <div class="profile-block social-links">
+      <table>
+        <tr>
+          
+<td><a href="//github.com/SugarStars" target="_blank" title="GitHub"><i class="fa fa-github"></i></a></td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          <td><a href="https://sugarstar88.github.io/index.xml" target="_blank" title="RSS"><i class="fa fa-rss"></i></a></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</aside>
+
+    
+
+    <section id="main">
+    
+    <article id="page-undefined" class="article article-type-page" itemscope="" itemprop="blogPost">
+    <div class="article-inner">
+        
+
+        <header class="article-header">
+    <a href="https://sugarstar88.github.io/2020/06/11/mybatis/">
+    <h1 class="article-title" itemprop="name">
+        MyBatis
+    </h1>
+    </a>
+    <div class="article-meta">
+
+        
+        <div class="article-date">
+            <i class="fa fa-calendar"></i>
+            <time datetime="2020-06-11 15:30:12 &#43;0800 CST" itemprop="datePublished">2020-06-11</time>
+            &middot;
+            1157
+            
+            &middot;
+            6
+            次阅读
+        </div>
+        
+        
+
+        
+    </div>
+</header>
+
+        <div class="article-entry" itemprop="articleBody">
+            
+
+<h1 id="一-简介">一、简介</h1>
+
+<p>MyBatis开源免费框架，原名iBatis，2010年在google，2013年迁移到github</p>
+
+<h2 id="作用">作用</h2>
+
+<p>数据访问层框架，底层是对jdbc的封装</p>
+
+<h2 id="mybatis优点之一">MyBatis优点之一</h2>
+
+<p>使用MyBatis时，不需要编写实现类，只需要编写执行的sql命令</p>
+
+<h1 id="二-环境搭建">二、环境搭建</h1>
+
+<h2 id="1-导入jar">1. 导入jar</h2>
+
+<ul>
+<li>asm-3.3.1.jar</li>
+<li>cglib-2.2.2.jar</li>
+<li>commons-logging-1.1.1.jar</li>
+<li>javassist-3.17.1-GA.jar</li>
+<li>log4j-1.2.17.jar</li>
+<li>log4j-api-2.0-rc1.jar</li>
+<li>log4j-core-2.0-rc1.jar</li>
+<li>mybatis-3.2.7.jar</li>
+<li>ojdbc14-10.2.0.1.0.jar</li>
+<li>slf4j-api-1.7.5.jar</li>
+<li>slf4j-log4j12-1.7.5.jar</li>
+</ul>
+
+<h2 id="2-在src下新建全局配置文件-编写jdbc四个变量">2. 在src下新建全局配置文件(编写JDBC四个变量)</h2>
+
+<ul>
+<li>没有名称和地址要求</li>
+
+<li><p>在全局配置文件中引入DTD或Schema</p>
+
+<ul>
+<li>若导入DTD后没有提示，Window-&gt;preference-&gt;XML-&gt;XML catalog-&gt;add
+<img src="https://cdn.jsdelivr.net/gh/sugarstar88/imgHosting/ITRHX-PIC/ADD_XML_Catalog.png" alt="" /></li>
+</ul></li>
+
+<li><p>全局配置文件内容</p></li>
+</ul>
+
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE configuration
+  PUBLIC &quot;-//mybatis.org//DTD Config 3.0//EN&quot;
+  &quot;http://mybatis.org/dtd/mybatis-3-config.dtd&quot;&gt;
+&lt;configuration&gt;
+    &lt;!-- default引用 environment的id, 当前所使用的环境--&gt;
+    &lt;environments default=&quot;oracle&quot;&gt;
+    &lt;!-- 声明可以使用的环境 --&gt;
+        &lt;environment id=&quot;oracle&quot;&gt;
+            &lt;!-- 使用原生jdbc事务 --&gt;
+            &lt;transactionManager type=&quot;JDBC&quot;&gt;&lt;/transactionManager&gt;
+            &lt;dataSource type=&quot;POOLED&quot;&gt;
+                &lt;property name=&quot;driver&quot; value=&quot;oracle.jdbc.driver.OracleDriver&quot;/&gt;
+                &lt;property name=&quot;url&quot; value=&quot;jdbc:oracle:thin:@localhost:1521:orcl&quot;/&gt;
+                &lt;property name=&quot;username&quot; value=&quot;TX_USER&quot;/&gt;
+                &lt;property name=&quot;password&quot; value=&quot;TX_USER&quot;/&gt;
+            &lt;/dataSource&gt;
+        &lt;/environment&gt;
+    &lt;/environments&gt;
+    &lt;mappers&gt;
+        &lt;mapper resource=&quot;com/sugar/mapper/FlowerMapper.xml&quot;/&gt;
+    &lt;/mappers&gt;
+&lt;/configuration&gt;
+</code></pre>
+
+<h2 id="3-新建以mapper结尾的包-在包下新建-实体类名-mapper-xml">3. 新建以mapper结尾的包，在包下新建：实体类名+Mapper.xml</h2>
+
+<ul>
+<li>文件作用，编写需要执行的sql命令</li>
+<li>把xml理解成实现类</li>
+<li>xml内容</li>
+</ul>
+
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE mapper
+  PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
+  &quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
+&lt;!-- namespace: 理解成实现类的全路径(包名+类名) --&gt;
+&lt;mapper namespace=&quot;a.b&quot;&gt;
+    &lt;!-- id: 方法名
+    parameterType: 定义参数类型
+    resultType: 返回值类型
+    
+    如果返回值是list,在resultType中写list的泛型,因为MyBatis是对
+    jdbc封装,一行一行读取数据.
+     --&gt;
+     &lt;select id=&quot;selAll&quot; resultType=&quot;com.sugar.pojo.Flower&quot;&gt;
+        SELECT * FROM Flower
+     &lt;/select&gt;
+&lt;/mapper&gt;
+</code></pre>
+
+<ul>
+<li>测试结果(只有在单独使用)</li>
+</ul>
+
+<h1 id="三-环境搭建详解">三、环境搭建详解</h1>
+
+<p>全局配置文件中的内容</p>
+
+<h2 id="1-transactionmanager-type属性">1. <code>&lt;transactionManager/&gt;</code>type属性</h2>
+
+<ul>
+<li>JDBC，事务管理使用JDBC原生事务管理方式</li>
+<li>MANAGED，把事务管理转交给其他容器，原生JDBC事务<code>setAutoMapping(false)</code></li>
+</ul>
+
+<h2 id="2-datasource-type属性">2. <code>&lt;dataSource/&gt;</code> type属性</h2>
+
+<ul>
+<li>POOLED，使用数据库连接池</li>
+<li>UNPOOLED，不使用数据库连接池，和直接使用JDBC一样</li>
+<li>JNDI，java命名目录接口技术</li>
+</ul>
+
+<h1 id="四-数据库连接池">四、数据库连接池</h1>
+
+<p>在内存中开辟一块空间，存放多个数据库连接对象</p>
+
+<h2 id="jdbc-tomcat-pool-直接由tomcat产生数据库连接池">JDBC Tomcat Pool，直接由Tomcat产生数据库连接池</h2>
+
+<p>图示</p>
+
+<p><img src="https://cdn.jsdelivr.net/gh/sugarstar88/imgHosting/ITRHX-PIC/Tomcat_Pool.png" alt="" /></p>
+
+<ul>
+<li>active状态，当前连接对象被应用程序使用</li>
+<li>idle空闲状态，等待应用程序使用
+<br /></li>
+</ul>
+
+<h2 id="使用数据库连接池目的">使用数据库连接池目的</h2>
+
+<ul>
+<li>高频率访问数据库时，使用数据库连接池可以降低服务器系统压力，提升运行效率</li>
+<li>小型项目不适用数据库连接池</li>
+</ul>
+
+<h2 id="实现jdbc-tomcat-pool的步骤">实现JDBC Tomcat Pool的步骤</h2>
+
+<h3 id="1-在web项目的-meta-inf-中存放-context-xml-编写数据库连接池相关属性">1. 在web项目的<code>META-INF</code>中存放<code>context.xml</code>，编写数据库连接池相关属性</h3>
+
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;Context&gt;
+    &lt;Resource 
+              driverClassName=&quot;oracle.jdbc.driver.OracleDriver&quot;
+              url=&quot;jdbc:oracle:thin:@localhost:1521:orcl&quot;
+              username=&quot;tx_user&quot;
+              password=&quot;tx_user&quot;
+              maxActive=&quot;50&quot;
+              maxIdle=&quot;20&quot;
+              name=&quot;test&quot;
+              auth=&quot;Container&quot;
+              maxWait=&quot;10000&quot;
+              type=&quot;javax.sql.DataSource&quot;
+              /&gt;
+&lt;/Context&gt;
+</code></pre>
+
+<h3 id="2-把项目发布到tomcat中-数据库连接池产生了">2. 把项目发布到Tomcat中，数据库连接池产生了</h3>
+
+<h2 id="可以在java中使用jndi获取数据库连接池对象">可以在java中使用jndi获取数据库连接池对象</h2>
+
+<ul>
+<li>Context，上下文接口，<code>context.xml</code>文件对象类型</li>
+</ul>
+
+<p>代码如下</p>
+
+<pre><code class="language-java">Context ctx = new InitialContext();
+DataSource ds = (DataSource)ctx.lookup(&quot;java:comp/env/test&quot;);
+Connection conn = ds.getConnection();
+</code></pre>
+
+<ul>
+<li>当关闭连接对象时，把连接对象归还给数据库连接池，把状态改成Idle</li>
+</ul>
+
+<h1 id="五-三种查询方式">五、三种查询方式</h1>
+
+<h2 id="selectlist-返回值为list-resulttype属性控制">selectList()返回值为List<resultType属性控制></h2>
+
+<p>适用于查询结果都需要遍历的需求</p>
+
+<pre><code class="language-java">List&lt;Flower&gt; list = session.selectList(&quot;a.b.selAll&quot;);
+for(Flower flower : list) {
+    System.out.println(flower);
+}
+</code></pre>
+
+<h2 id="selectone-返回值object">selectOne()返回值Object</h2>
+
+<p>适用于返回结果只是变量或一行数据时</p>
+
+<pre><code class="language-java">int count = session.selectOne(&quot;a.b.selById&quot;);
+System.out.println(count);
+</code></pre>
+
+<h2 id="selectmap-返回值map">selectMap()返回值map</h2>
+
+<p>适用于需要在查询结果中通过某列的值取到这行数据的需求</p>
+
+<pre><code class="language-java">Map&lt;Object, Object&gt; map = session.selectMap(&quot;a.b.c&quot;,&quot;name123&quot;);
+System.out.println(map);
+</code></pre>
+
+<h1 id="六-log4j">六、Log4J</h1>
+
+<p>由Apache推出的开源免费日志处理的类库</p>
+
+<h2 id="为什么需要日志">为什么需要日志</h2>
+
+<ul>
+<li>在项目编写时通过System.out.println()输出到控制台，当项目发布到Tomcat没有控制台(命令行界面可以看见)，不容易观察一些输出结果</li>
+<li>Log4J作用，不仅能把内容输出到控制台，还能把内容输出到文件中，便于观察。</li>
+</ul>
+
+<h2 id="使用步骤">使用步骤</h2>
+
+<h3 id="1-导入log4j-xxx-jar包">1. 导入log4j-xxx.jar包</h3>
+
+<h3 id="2-在src下新建log4j-properties-路径和名称都不允许改变">2. 在src下新建log4j.properties(路径和名称都不允许改变)</h3>
+
+<ul>
+<li>ConversionPattern，写表达式</li>
+<li>log4j.appender.LOGFILE.File，文件位置及文件名称(日志文件扩展名)</li>
+</ul>
+
+<pre><code class="language-properties">log4j.rootCategory=ERROR, CONSOLE, LOGFILE
+
+log4j.logger.a=DEBUG
+log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender
+log4j.appender.CONSOLE.layout=org.apache.log4j.PatternLayout
+log4j.appender.CONSOLE.layout.ConversionPattern= %C %p %m %n
+
+log4j.appender.LOGFILE=org.apache.log4j.FileAppender
+log4j.appender.LOGFILE.File=mylog.log
+log4j.appender.LOGFILE.Append=true
+log4j.appender.LOGFILE.layout=org.apache.log4j.PatternLayout
+log4j.appender.LOGFILE.layout.ConversionPattern= %C %m %n
+</code></pre>
+
+<h2 id="log4j输出级别">Log4J输出级别</h2>
+
+<p>fatal(致命错误) &gt; error(错误) &gt; warn(警告) &gt; info(普通信息) &gt; debug(调试)</p>
+
+<h2 id="pattern中常用表达式">Pattern中常用表达式</h2>
+
+<ul>
+<li><p>%C ，包名</p></li>
+
+<li><p>%d{YYYY-MM-dd HH:mm:ss}，时间</p></li>
+
+<li><p>%L，行号</p></li>
+
+<li><p>%m，信息</p></li>
+
+<li><p>%n，换行</p></li>
+</ul>
+
+<h1 id="七-settings-标签">七、<code>&lt;settings&gt;</code>标签</h1>
+
+<p>在MyBatis全局配置文件中通过<code>&lt;settings&gt;</code>标签控制MyBatis全局开关</p>
+
+<h2 id="在-mybatis-xml-中开启log4j">在<code>mybatis.xml</code>中开启Log4J</h2>
+
+<h3 id="1-必须保证有log4j-jar">1. 必须保证有log4j.jar</h3>
+
+<h3 id="2-在src下有-log4j-properties">2. 在src下有<code>log4j.properties</code></h3>
+
+<pre><code class="language-xml">&lt;settings&gt;
+    &lt;setting name=&quot;logImpl&quot; value=&quot;LOG4J&quot;/&gt;
+&lt;settings/&gt;
+</code></pre>
+
+<h3 id="3-log4j中可以输出制定内容的日志">3. log4j中可以输出制定内容的日志</h3>
+
+<ul>
+<li><p>命名级别(包级别)，<code>&lt;mapper&gt;</code>中<code>namespace</code>属性中除了最后一个类名，例如<code>namespace=&quot;com.sugar.mapper.PeopleMapper&quot;</code>其中包级别为<code>com.sugar.mapper</code>,需要在log4.properties中</p>
+
+<ul>
+<li>现在总体级别调成Error不输出无用信息</li>
+<li>设置某个制定位置级别为DEBUG</li>
+</ul></li>
+</ul>
+
+<pre><code class="language-properties">log4j.rootCategory=ERROR, CONSOLE, LOGFILE
+
+log4j.logger.com.sugar.mapp=DEBUG
+</code></pre>
+
+<ul>
+<li><p>类级别，<code>namespace</code>属性值，<code>namespace</code>类名</p></li>
+
+<li><p>方法级别，<code>namespace</code>属性值+标签id属性值</p></li>
+</ul>
+
+<h1 id="八-parametertype属性">八、parameterType属性</h1>
+
+<p>在XXXMapper.xml中<code>&lt;select&gt;</code>、<code>&lt;delete&gt;</code>等标签的<code>parameterType</code>属性，可以控制参数类型</p>
+
+<h2 id="sqlsession的selectlist-和selectone-的第二个参数和selectmap-的第三个参数都表示方法的参数">SqlSession的selectList()和selectOne()的第二个参数和selectMap()的第三个参数都表示方法的参数</h2>
+
+<ul>
+<li>示例</li>
+</ul>
+
+<pre><code class="language-java">People peo = session.selectOne(&quot;a.b.selById&quot;, 1);
+System.out.println(peo);
+</code></pre>
+
+<ul>
+<li><p>在<code>Mapper.xml</code>中可以通过<code>#{}</code>获取参数</p>
+
+<ul>
+<li><code>parameterType</code>控制参数类型</li>
+
+<li><p><code>#{}</code>获取参数内容</p>
+
+<ul>
+<li>使用索引，从0开始<code>#{0}</code>表示第一个参数</li>
+<li>也可以使用<code>#{param1}</code>表示第一个参数</li>
+<li>如果<font color="red">只有一个参数(基本数据类型或String)</font>，mybatis对<code>#{}</code>里的内容没有要求只要写内容即可</li>
+<li>如果参数是对象，写成<code>#{属性名}</code></li>
+
+<li><p>如果参数时map，写成<code>#{key}</code></p>
+
+<pre><code class="language-xml">&lt;select id=&quot;selById&quot; resultType=&quot;com.sugar.pojo.People&quot; parameterType=&quot;int&quot;&gt;
+SELECT * FROM People where id = #{0}
+&lt;/select&gt;
+</code></pre>
+
+<ul>
+<li><p><code>#{}</code>和<code>${}</code>的区别</p></li>
+
+<li><p><code>#{}</code>获取的参数内容支持，索引获取、param1获取指定位置参数，并且SQL使用?占位符</p></li>
+
+<li><p><code>${}</code>字符串拼接不使用?，默认找${内容}的<code>get/set</code>方法，如果写数字，就是一个数字</p></li>
+
+<li><p>如果在xml文件中出现<code>&lt;</code>，<code>&gt;</code>,<code>&quot;</code>等字符时可以使用XML文件转义标签(XML自身的)</p></li>
+
+<li><p><code>&lt;![CDATA[内容]]&gt;</code></p></li>
+
+<li><p>MyBatis中实现mysql分页写法</p></li>
+
+<li><p>? 不允许在关键字前后进行数学运算，需要在代码中计算完成后传递到<code>mapper.xml</code>中</p></li>
+</ul>
+
+<h1 id="九-typealiases别名">九、typeAliases别名</h1>
+
+<p>系统内置别名：将类名全部小写</p>
+
+<h2 id="给某个类起别名">给某个类起别名</h2>
+
+<ul>
+<li>alias=&ldquo;自定义&rdquo;</li>
+</ul>
+
+<pre><code class="language-xml">&lt;typeAliases&gt;
+&lt;typeAlias type=&quot;com.sugar.pojo.People&quot; alias=&quot;peo&quot;/&gt;
+&lt;/typeAliases&gt;
+</code></pre></li>
+</ul></li>
+</ul></li>
+
+<li><p>在mapper中直接引用</p></li>
+</ul>
+
+<pre><code class="language-xml">&lt;select id=&quot;page&quot; resultType=&quot;peo&quot; parameterType=&quot;map&quot;&gt;
+     SELECT * FROM People LIMIT #{pageStart}, #{pageSize}
+&lt;/select&gt;
+</code></pre>
+
+<h2 id="直接给某个包下所有类起别名-别名为类名-区分大小写">直接给某个包下所有类起别名，别名为类名，区分大小写</h2>
+
+<ul>
+<li><code>mybatis.xml</code>中配置</li>
+</ul>
+
+<pre><code class="language-xml">&lt;typeAliases&gt;
+    &lt;package name=&quot;com.sugar.pojo&quot;/&gt;
+&lt;/typeAliases&gt;
+</code></pre>
+
+<ul>
+<li><code>mapper.xml</code>中通过类名引用</li>
+</ul>
+
+<pre><code class="language-xml">&lt;select id=&quot;page&quot; resultType=&quot;People&quot; parameterType=&quot;map&quot;&gt;
+     SELECT * FROM People LIMIT #{pageStart}, #{pageSize}
+&lt;/select&gt;
+</code></pre>
+
+<h1 id="十-mybatis实现新增">十、MyBatis实现新增</h1>
+
+<p>事务，从数据库角度出发，完成业务时需要执行的SQL集合，统称一个事务。</p>
+
+<p>事务回滚，如果在一个事务中某个SQL执行事务，希望回归到事务的原点，保证数据库数据的完整性。</p>
+
+<h2 id="在mybatis中默认关闭了jdbc的自动提交功能">在MyBatis中默认关闭了JDBC的自动提交功能</h2>
+
+<ul>
+<li>每一个SqlSession默认都是不自动提交事务</li>
+<li><code>session.commit()</code>，提交事务</li>
+<li><code>openSession(true)</code>，打开自动提交相当于<code>setAutoCommit(true)</code></li>
+</ul>
+
+<h2 id="mybatis底层是对jdbc的封装">MyBatis底层是对JDBC的封装</h2>
+
+<ul>
+<li>JDBC中<code>executeUpdate()</code>执行新增、删除、修改的SQL返回值int，表示受影响行数</li>
+<li>MyBatis中<code>&lt;insert&gt;</code>、<code>delete</code>、<code>update</code>标签没有<code>resultType</code>属性，认为返回值都是int</li>
+</ul>
+
+<h2 id="在-opensession-时-mybatis会创建sqlsession时同时创建一个transaction-事务对象-同时-autocommit-都是false">在<code>OpenSession()</code>时，MyBatis会创建SqlSession时同时创建一个Transaction(事务对象)，同时<code>autoCommit</code>都是false</h2>
+
+<ul>
+<li>如果出现异常，应该session.rollback()回滚事务</li>
+</ul>
+
+<h1 id="十一-mybatis接口绑定方案及多参数传递">十一、MyBatis接口绑定方案及多参数传递</h1>
+
+<p>实现创建一个接口后把<code>mapper.xml</code>由mybatis生成接口的实现类，通过调用接口对象就可以获取<code>mapper.xml</code>中编写的sql，MyBatis和Spring整合使用的是该方案</p>
+
+<h2 id="实现步骤">实现步骤</h2>
+
+<h3 id="1-创建一个接口">1. 创建一个接口</h3>
+
+<ul>
+<li>接口包名和接口名与<code>mapper.xml</code>中<code>&lt;mapper&gt;</code>的<code>namespace</code>相同</li>
+<li>接口方法名和<code>mapper.xml</code>标签的id属性相同</li>
+</ul>
+
+<h3 id="2-在-mybatis-xml-中使用-package-进行接口扫描和-mapper-xml">2. 在<code>mybatis.xml</code>中使用<code>&lt;package&gt;</code>进行接口扫描和<code>mapper.xml</code></h3>
+
+<h3 id="3-代码实现步骤">3. 代码实现步骤</h3>
+
+<ol>
+<li>在<code>mybatis.xml</code>中<code>&lt;mappers&gt;</code> 下使用<code>&lt;package&gt;</code></li>
+</ol>
+
+<pre><code class="language-xml">&lt;mappers&gt;
+    &lt;package name=&quot;com.sugar.mapper&quot;/&gt;
+&lt;/mappers&gt;
+</code></pre>
+
+<ol>
+<li>在com.sugar.mapper下新建接口</li>
+</ol>
+
+<pre><code class="language-java">public interface LogMapper{
+    List&lt;Log&gt; selAll();
+}
+</code></pre>
+
+<ol>
+<li>在<code>com.sugar.mapper</code>新建一个<code>LogMapper.xml</code></li>
+<li><code>namespace</code>必须和接口全限定路径(包名+类名)</li>
+<li>id必须和接口中方法名相同</li>
+
+<li><p>如果接口中方法为多个参数，可以省略parameterType</p>
+
+<pre><code class="language-xml">&lt;mapper namespace=&quot;com.sugar.mapper.LogMapper&quot;&gt;
+ &lt;select id=&quot;selAll&quot; resultType=&quot;log&quot;&gt;
+    SELECT * FROM Log
+ &lt;/select&gt;
+&lt;/mapper&gt;
+</code></pre>
+
+<ol>
+<li>多参数实现方法</li>
+</ol>
+
+<ul>
+<li>在接口中声明方法
+<br /></li>
+</ul>
+
+<pre><code class="language-java">List&lt;Log&gt; selByAccInAccout(String accin, String accout);
+</code></pre></li>
+</ol>
+
+<ul>
+<li>在<code>mapper.xml</code>中添加，<code>#{}</code>中使用0，1，2或param1，param2</li>
+</ul>
+
+<pre><code class="language-xml">&lt;!--多参数时，不需要写parameterType--&gt;
+&lt;select id=&quot;selByAccInAccout&quot; resultType=&quot;log&quot;&gt;
+    SELECT * FROM Log WHERE accin=#{0} and accout=#{1}
+&lt;/select&gt;
+</code></pre>
+
+<ul>
+<li>可以使用注解方式，在接口中声明方法</li>
+</ul>
+
+<pre><code class="language-java">/**
+* mybatis把参数转换成map，其中@Param(&quot;key&quot;)参数内容就是map的value
+*/
+List&lt;Log&gt; selByAccInAccout(@Param(&quot;accin&quot;)String accin123, @Param(&quot;accout&quot;)String accout456);
+</code></pre>
+
+<ul>
+<li><p>在<code>mapper.xml</code> 中添加，<code>#{}</code>里面写<code>@Param(&quot;内容&quot;)</code>参数中内容</p>
+
+<pre><code class="language-xml">&lt;!--多参数时，不需要写parameterType--&gt;
+&lt;select id=&quot;selByAccInAccout&quot; resultType=&quot;log&quot;&gt;
+SELECT * FROM Log WHERE accin=#{accin} and accout=#{accout}
+&lt;/select&gt;
+</code></pre>
+
+<h1 id="十二-动态sql">十二、动态SQL</h1>
+
+<p>根据不同的条件需要执行不同的SQL命令，称为动态SQL</p>
+
+<p>MyBatis动态SQL在<code>mapper.xml</code>中添加判断逻辑等</p>
+
+<h2 id="if-的使用"><code>&lt;if&gt;</code>的使用</h2>
+
+<p>代码示例</p>
+
+<pre><code class="language-xml">&lt;select id=&quot;selByAccinAccout&quot; resultType=&quot;log&quot;&gt;
+SELECT * FROM log WHERE 1=1
+&lt;!-- OGNL表达式,直接写key或者对象的属性,不需要添加任何特殊符号 --&gt;
+&lt;if test=&quot;accin != null and accin !='' &quot;&gt;
+    AND accin=#{accin}
+&lt;/if&gt;
+&lt;if test=&quot;accout != null and accout !='' &quot;&gt;
+    AND accout=#{accout}
+&lt;/if&gt;
+&lt;/select&gt;
+</code></pre></li>
+</ul>
+
+<h2 id="where-的使用"><code>&lt;where&gt;</code>的使用</h2>
+
+<p>当编写<code>&lt;where&gt;</code>标签时，如果内容第一个是and去掉第一个and</p>
+
+<p>如果<code>&lt;where&gt;</code>标签中有内容会生成where关键字，如果没有内容不生成where关键字</p>
+
+<p>比直接使用<code>&lt;if&gt;</code>少写了<code>WHERE 1=1</code></p>
+
+<p>代码示例</p>
+
+<pre><code class="language-xml">&lt;select id=&quot;selByAccinAccout&quot; resultType=&quot;log&quot;&gt;
+    SELECT * FROM log 
+    &lt;where&gt;
+        &lt;if test=&quot;accin != null and accin !='' &quot;&gt;
+            AND accin=#{accin}
+        &lt;/if&gt;
+        &lt;if test=&quot;accout != null and accout !='' &quot;&gt;
+            AND accout=#{accout}
+        &lt;/if&gt;
+    &lt;/where&gt;
+&lt;/select&gt;
+</code></pre>
+
+<h2 id="choose-when-otherwise-的使用"><code>&lt;choose&gt;</code>、<code>&lt;when&gt;</code>、<code>&lt;otherwise&gt;</code>的使用</h2>
+
+<p>只要有一个成立，其他都不执行</p>
+
+<p>代码示例</p>
+
+<ul>
+<li>如果accin和accout都不为null或不是&rdquo;&ldquo;，生成的sql只有<code>WHERE accin=?</code></li>
+</ul>
+
+<pre><code class="language-xml">&lt;select id=&quot;selByAccinAccout&quot; resultType=&quot;log&quot;&gt;
+    SELECT * FROM log
+    &lt;where&gt;
+        &lt;choose&gt;
+            &lt;when test=&quot;accin != null and accin !='' &quot;&gt;
+                AND accin=#{accin}
+            &lt;/when&gt;
+            &lt;when test=&quot;accout != null and accout !='' &quot;&gt;
+                AND accout=#{accout}
+            &lt;/when&gt;
+        &lt;/choose&gt;
+    &lt;/where&gt;
+&lt;/select&gt;
+</code></pre>
+
+<h2 id="set-的使用"><code>&lt;set&gt;</code>的使用</h2>
+
+<p>用在修改SQL中set从句</p>
+
+<p>作用</p>
+
+<ul>
+<li>去掉最后一个逗号</li>
+<li>如果<code>&lt;set&gt;</code>里面有内容生成set关键字，没有就不生成</li>
+</ul>
+
+<p>代码示例</p>
+
+<ul>
+<li><code>id=#{id}</code>的目的防止<code>&lt;set&gt;</code>中没有内容，MyBatis不生成set关键字，如果修改中没有set从句会报SQL语法错误</li>
+</ul>
+
+<pre><code class="language-xml">&lt;update id=&quot;upd&quot; parameterType=&quot;log&quot;&gt;   
+    UPDATE Log
+    &lt;set&gt;
+        id=#{id},
+        &lt;if test=&quot;accin != null and accin != ''&quot;&gt;
+            accin=#{accin},
+        &lt;/if&gt;
+        &lt;if test=&quot;accout != null and accout !='' &quot;&gt;
+            accout=#{accout},
+        &lt;/if&gt;
+    &lt;/set&gt;
+    WHERE id=#{id}
+&lt;/update&gt;
+</code></pre>
+
+<h2 id="trim-的使用"><code>&lt;Trim&gt;</code>的使用</h2>
+
+<ul>
+<li>prefix，在前面添加内容</li>
+<li>prefixOverrides，去掉前面内容</li>
+<li>suffix，在后面添加内容</li>
+<li>suffixOverrides，去掉后面内容</li>
+</ul>
+
+<p>执行顺序去掉内容后添加内容</p>
+
+<p>代码示例</p>
+
+<pre><code class="language-xml">&lt;select id=&quot;upd&quot; parameterType=&quot;log&quot;&gt;
+    UPDATE Log
+    &lt;trim prefix=&quot;set&quot; suffixOverrides=&quot;,&quot;&gt;
+        a=a,
+    &lt;/trim&gt;
+    WHERE id=100
+&lt;/select&gt;
+</code></pre>
+
+<h2 id="bind-的使用"><code>&lt;bind&gt;</code>的使用</h2>
+
+<p>给参数重新赋值</p>
+
+<p>场景</p>
+
+<ul>
+<li><p>模糊查询</p></li>
+
+<li><p>在原内容前或后添加内容</p></li>
+</ul>
+
+<p>代码示例</p>
+
+<pre><code class="language-xml">&lt;select id=&quot;selByLog&quot; parameterType=&quot;log&quot; resultType=&quot;log&quot;&gt;
+    &lt;bind name=&quot;accin&quot; value=&quot;'%'+accin+'%'&quot;/&gt;
+    #{money}
+&lt;/select&gt;
+</code></pre>
+
+<h2 id="foreach-的使用"><code>&lt;foreach&gt;</code>的使用</h2>
+
+<p>循环参数内容，还具备在内容前后添加内容，还具备添加分隔符功能</p>
+
+<p>适用场景，in查询中，批量新增中(mybatis中foreach效率比较低)</p>
+
+<ul>
+<li>如果希望批量新增，SQL命令</li>
+</ul>
+
+<pre><code class="language-sql">INSERT INTO Log VALUES
+(default,1,2,3),(default,2,3,4),(default,3,4,5)
+</code></pre>
+
+<ul>
+<li>openSession()必须指定
+
+<ul>
+<li>底层JDBC的PreparedStatement.addBatch()</li>
+</ul></li>
+</ul>
+
+<pre><code class="language-java">factory.openSession(ExecutorType.BATCH);
+</code></pre>
+
+<ul>
+<li><p>代码示例</p>
+
+<ul>
+<li>collection=&ldquo;&ldquo;，要遍历的集合</li>
+<li>item，迭代变量，#{迭代变量名}获取内容</li>
+<li>open，循环后左侧添加的内容</li>
+<li>close，循环后右侧添加的内容</li>
+<li>separator，每次循环时，元素之间的分隔符</li>
+</ul></li>
+</ul>
+
+<pre><code class="language-xml">&lt;select id=&quot;selIn&quot; parameterType=&quot;list&quot; resultType=&quot;log&quot;&gt;
+    SELECT * FROM Log WHERE id IN
+    &lt;foreach collection=&quot;list&quot; item=&quot;abc&quot; open=&quot;(&quot; close=&quot;)&quot; separator=&quot;,&quot;&gt;
+        #{abc}
+    &lt;/foreach&gt;
+&lt;/select&gt;
+</code></pre>
+
+<h2 id="sql-和-include"><code>&lt;sql&gt;</code>和<code>&lt;include&gt;</code></h2>
+
+<p>某些SQL片段如果希望复用，可以使用<code>&lt;sql&gt;</code>定义这个偏片段</p>
+
+<p>代码示例</p>
+
+<pre><code class="language-xml">&lt;sql id=&quot;mysql&quot;&gt;
+    id, accin, accout, money
+&lt;/sql&gt;
+</code></pre>
+
+<p>在<code>&lt;select&gt;</code>或<code>&lt;delete&gt;</code>或<code>&lt;update&gt;</code>或<code>&lt;insert&gt;</code>中使用<code>&lt;include&gt;</code>引用</p>
+
+<p>代码示例</p>
+
+<pre><code class="language-xml">&lt;sql id=&quot;mysql&quot;&gt;
+    id, accin, accout, money
+&lt;/sql&gt;
+&lt;select id=&quot;&quot;&gt;
+    SELECT 
+    &lt;include refid=&quot;mysql&quot;&gt;&lt;/include&gt;
+    FROM Log
+&lt;/select&gt;
+</code></pre>
+
+<h1 id="十三-threadlocal">十三、ThreadLocal</h1>
+
+<p>线程容器，给线程绑定一个Object内容</p>
+
+<h1 id="十四-缓存">十四、缓存</h1>
+
+<p>应用程序与数据库交互的过程是一个相对比较耗时的过程</p>
+
+<h2 id="作用-1">作用</h2>
+
+<p>让程序减少对数据库访问，提示运行效率</p>
+
+<h2 id="mybatis中默认sqlsession缓存开启">Mybatis中默认SqlSession缓存开启</h2>
+
+<ul>
+<li><p>同一个SqlSession对象调用同一个<code>&lt;select&gt;</code>时，只有第一次访问数据库，第一次之后把查询结果返回到SqlSession缓存区（内存）中</p></li>
+
+<li><p>缓存的是statement对象(简单记忆必须是同一个<code>&lt;select&gt;</code>)，在mybatis时一个<code>&lt;select&gt;</code>对应一个statement对象</p></li>
+
+<li><p>有效范围必须是同一个<code>SqlSession</code>对象</p></li>
+</ul>
+
+<h2 id="缓存流程">缓存流程</h2>
+
+<ol>
+<li><p>先去缓存区找是否存在statement对象</p></li>
+
+<li><p>返回结果</p></li>
+
+<li><p>若果没有缓存statement对象，去数据库获取数据</p></li>
+
+<li><p>数据库返回查询结果</p></li>
+
+<li><p>把查询结果放到对应的缓存区中</p></li>
+</ol>
+
+<p><img src="https://cdn.jsdelivr.net/gh/sugarstar88/imgHosting/ITRHX-PIC/Caching_Process.png" alt="" /></p>
+
+<h2 id="sqlsessionfactory缓存">SqlSessionFactory缓存</h2>
+
+<p>二级缓存</p>
+
+<ul>
+<li>有效范围，同一个factory内哪个SqlSession都可以获取</li>
+
+<li><p>什么时候使用二级缓存，当数据频繁被使用，很少被修改</p>
+
+<h3 id="使用二级缓存步骤">使用二级缓存步骤</h3></li>
+</ul>
+
+<ol>
+<li>在<code>mapper.xml</code>中添加</li>
+<li>如下不写<code>readOnly=&quot;true&quot;</code>需要把实体类序列化</li>
+</ol>
+
+<pre><code class="language-xml">&lt;cache readOnly=&quot;true&quot;&gt;&lt;/cache&gt;
+</code></pre>
+
+<p>当SqlSession对象<code>close()</code>或<code>commit()</code>时会把<code>SqlSession</code>缓存的数据刷(flush)到<code>SqlSessionFactory</code>缓存区中</p>
+
+<h1 id="十五-mybatis实现多表查询">十五、MyBatis实现多表查询</h1>
+
+<h2 id="mybatis实现多表查询方式">MyBatis实现多表查询方式</h2>
+
+<ol>
+<li>业务装配，对两个表编写单表查询语句，在业务(Service)把查询的两个结果进行关联</li>
+<li>使用Auto Mapping特性，在实现两表联合查询时通过别名完成映射</li>
+<li>使用MyBatis的<code>&lt;resultMap&gt;</code>标签进行实现</li>
+</ol>
+
+<h2 id="多表查询时-类中包含另一个类的对象的分类">多表查询时，类中包含另一个类的对象的分类</h2>
+
+<ol>
+<li>单个对象</li>
+<li>集合对象</li>
+</ol>
+
+<h1 id="十六-resultmap-标签">十六、<code>&lt;resultMap&gt;</code>标签</h1>
+
+<p><code>&lt;resultMap&gt;</code>标签写在<code>mapper.xml</code>中，由程序员控制SQL查询结果与实体类的映射关系，默认MyBatis使用Auto Mapping特性。</p>
+
+<p>使用<code>&lt;resultMap&gt;</code>标签时，<code>&lt;select&gt;</code>标签不写resultType属性，而是使用resultMap属性引用<code>&lt;resultMap&gt;</code>标签。</p>
+
+<h2 id="使用resultmap实现单表映射关系">使用resultMap实现单表映射关系</h2>
+
+<ol>
+<li>数据库设计</li>
+</ol>
+
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>name</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>1</td>
+<td>老师1</td>
+</tr>
+
+<tr>
+<td>2</td>
+<td>老师2</td>
+</tr>
+</tbody>
+</table>
+
+<ol>
+<li>实体类设计</li>
+</ol>
+
+<pre><code class="language-java">public class Teacher{
+    private int id1;
+    private String name1;
+}
+</code></pre>
+
+<ol>
+<li>mapper.xml代码</li>
+</ol>
+
+<pre><code class="language-xml">&lt;resultMap type=&quot;teacher&quot; id=&quot;myMap&quot;&gt;
+    &lt;!-- 主键使用id标签配置映射关系 --&gt;
+    &lt;id column=&quot;id&quot; property=&quot;id1&quot;/&gt;
+    &lt;!-- 其他列使用result标签配置映射关系 --&gt;
+    &lt;result column=&quot;name&quot; property=&quot;name1&quot;/&gt;
+&lt;/resultMap&gt;
+&lt;select id=&quot;selAll&quot; resultMap=&quot;myMap&quot;&gt;
+    SELECT * FROM teacher
+&lt;/select&gt;
+</code></pre>
+
+<h2 id="使用resultmap实现关联单个对象-n-1方式">使用resultMap实现关联单个对象(N+1方式)</h2>
+
+<p>N+1查询方式，先查询出某个表的全部信息，根据这个表的信息查询另一个表的信息</p>
+
+<p>与业务装配的区别，在service中写代码，由MyBatis完成装配</p>
+
+<h3 id="实现步骤-1">实现步骤</h3>
+
+<ol>
+<li>在Student实现类中包含了一个Teacher对象</li>
+</ol>
+
+<pre><code class="language-java">public class Student{
+    private int id;
+    private String name;
+    private int age;
+    private tid;
+    private Teacher teacher;
+}
+</code></pre>
+
+<ol>
+<li>在<code>TeacherMapper.xml</code>中提供一个查询</li>
+</ol>
+
+<pre><code class="language-xml">&lt;select id=&quot;selById&quot; resultType=&quot;teacher&quot; parameterType=&quot;int&quot;&gt;
+    SELECT * FROM teacher WHERE id=#{0}
+&lt;/select&gt;
+</code></pre>
+
+<ol>
+<li>在<code>StudentMapper.xml</code>中</li>
+</ol>
+
+<ul>
+<li><code>&lt;association&gt;</code>装配一个对象时使用</li>
+<li>property，对象在类中</li>
+<li>select，通过那个查询，查询出这个对象的信息</li>
+<li>column，把当前表的哪个列的值作为参数传递给另一个查询</li>
+<li>大前提使用N+1方式时，如果列名和属性名相同可以不配置，使用Auto Mapping特性，但是MyBatis默认只会给列专配一次</li>
+</ul>
+
+<pre><code class="language-xml">&lt;resultMap type=&quot;student&quot; id=&quot;stuMap&quot;&gt;
+    &lt;id property=&quot;id&quot; column=&quot;id&quot;/&gt;
+    &lt;result property=&quot;name&quot; column=&quot;name&quot;/&gt;
+    &lt;result property=&quot;age&quot; column=&quot;age&quot;/&gt;
+    &lt;result property=&quot;tid&quot; column=&quot;tid&quot;/&gt;
+    &lt;!-- 如果关联一个对象 --&gt;
+    &lt;association property=&quot;teacher&quot; select=&quot;com.sugar.mapper.TeacherMapper.selById&quot; column=&quot;tid&quot;&gt;              &lt;/association&gt;
+&lt;/resultMap&gt;
+&lt;select id=&quot;selAll&quot; resultMap=&quot;stuMap&quot;&gt;
+    SELECT * FROM student
+&lt;/select&gt;
+</code></pre>
+
+<p>把上面代码简化成</p>
+
+<pre><code class="language-xml">&lt;resultMap type=&quot;student&quot; id=&quot;stuMap&quot;&gt;
+    &lt;result property=&quot;tid&quot; column=&quot;tid&quot;/&gt;
+    &lt;!-- 如果关联一个对象 --&gt;
+    &lt;association property=&quot;teacher&quot; select=&quot;com.sugar.mapper.TeacherMapper.selById&quot; column=&quot;tid&quot;&gt;              &lt;/association&gt;
+&lt;/resultMap&gt;
+&lt;select id=&quot;selAll&quot; resultMap=&quot;stuMap&quot;&gt;
+    SELECT * FROM student
+&lt;/select&gt;
+</code></pre>
+
+<h2 id="使用resultmap实现关联集合对象-n-1方式">使用resultMap实现关联集合对象(N+1方式)</h2>
+
+<ol>
+<li>在Teacher中添加<code>List&lt;Student&gt;</code></li>
+</ol>
+
+<pre><code class="language-java">public class Teacher{
+    private int id;
+    private String name;
+    private List&lt;Student&gt; list;
+}
+</code></pre>
+
+<ol>
+<li>在<code>StudentMapper.xml</code>中添加通过tid查询</li>
+</ol>
+
+<pre><code class="language-xml">&lt;select id=&quot;selById&quot; parameterType=&quot;int&quot; resultType=&quot;student&quot;&gt;
+    SELECT * FROM student WHERE tid=#{0}
+&lt;/select&gt;
+</code></pre>
+
+<ol>
+<li>在<code>TeacherMapper.xml</code>中添加查询全部</li>
+</ol>
+
+<ul>
+<li><code>&lt;collection/&gt;</code>当属性是集合类型时使用的标签</li>
+</ul>
+
+<pre><code class="language-xml">&lt;resultMap type=&quot;teacher&quot; id=&quot;myMap&quot;&gt;
+    &lt;result property=&quot;id&quot; column=&quot;id&quot;/&gt;
+    &lt;result property=&quot;name&quot; column=&quot;name&quot;/&gt;
+    &lt;collection property=&quot;list&quot; select=&quot;com.sugar.mapper.StudentMapper.selById&quot; column=&quot;id&quot;&gt;                &lt;/collection&gt;
+&lt;/resultMap&gt;
+&lt;select id=&quot;selAll&quot; resultMap=&quot;myMap&quot;&gt;
+    SELECT * FROM teacher
+&lt;/select&gt;
+</code></pre>
+
+<h2 id="使用-resultmap-实现加载集合数据-联合查询方式">使用<code>&lt;resultMap&gt;</code>实现加载集合数据(联合查询方式)</h2>
+
+<ol>
+<li>在<code>TeacherMapper.xml</code>中添加</li>
+</ol>
+
+<ul>
+<li>MyBatis可以通过主键判断对象是否被加载过</li>
+<li>不需要担心重复创建Teacher</li>
+</ul>
+
+<pre><code class="language-xml">&lt;resultMap type=&quot;teacher&quot; id=&quot;myMap&quot;&gt;
+    &lt;id column=&quot;tid&quot; property=&quot;id&quot;/&gt;
+    &lt;result column=&quot;tname&quot; property=&quot;name&quot;/&gt;
+    &lt;collection property=&quot;list&quot; ofType=&quot;student&quot;&gt;
+        &lt;id column=&quot;sid&quot; property=&quot;id&quot;/&gt;
+        &lt;result column=&quot;sname&quot; property=&quot;name&quot;/&gt;
+        &lt;result column=&quot;age&quot; property=&quot;age&quot;/&gt;
+        &lt;result column=&quot;tid&quot; property=&quot;tid&quot;/&gt;
+    &lt;/collection&gt;
+&lt;/resultMap&gt;
+
+&lt;select id=&quot;selAll&quot;&gt;
+    SELECT t.id tid, t.name tname, s.id sid, s.name sname, age, tid FROM teacher t LEFT JOIN student s on t.id = s.tid
+&lt;/select&gt;
+</code></pre>
+
+<h2 id="使用auto-mapping结合别名实现多表查询">使用Auto Mapping结合别名实现多表查询</h2>
+
+<p>只能使用多表联合查询方式，要求查询出的列名和属性名相同</p>
+
+<p>实现方式</p>
+
+<ul>
+<li>在SQL是关键字符，两侧添加反单引号</li>
+</ul>
+
+<pre><code class="language-xml">&lt;select id=&quot;selAll&quot; resultType=&quot;student&quot;&gt;
+    SELECT t.id `teacher.id`, t.name `teacher.name`, s.id id, s.name name, age, tid FROM student s LEFT     JOIN teacher t on t.id = s.tid
+&lt;/select&gt;
+</code></pre>
+
+<h1 id="十七-mybatis注解">十七、MyBatis注解</h1>
+
+<h2 id="作用-2">作用</h2>
+
+<p>简化配置文件</p>
+
+<h2 id="mybatis注解简化-mapper-xml-文件">MyBatis注解简化<code>mapper.xml</code>文件</h2>
+
+<p>如果涉及动态SQL依然使用<code>mapper.xml</code></p>
+
+<p>Mapper.xml和注解可以共存</p>
+
+<h2 id="使用注解时-mybatis-xml-中-mappers-使用">使用注解时，<code>mybatis.xml</code>中<code>&lt;mappers&gt;</code>使用</h2>
+
+<ol>
+<li><p><code>&lt;package/&gt;</code></p></li>
+
+<li><p><code>&lt;mapper class=&quot;&quot;&gt;</code></p></li>
+
+<li><p>查询</p>
+
+<pre><code class="language-java">@Select(&quot;select * from teacher&quot;)
+List&lt;Teacher&gt; selAll();
+</code></pre>
+
+<ol>
+<li>新增</li>
+</ol>
+
+<pre><code class="language-java">@Insert(&quot;insert into teacher values(default,#{name})&quot;)
+int insTeacher(Teacher teacher);
+</code></pre></li>
+
+<li><p>修改</p></li>
+</ol>
+
+<pre><code class="language-java">@Update(&quot;update teacher set name=#{name} where id=#{id}&quot;)
+int updTeacher(Teacher teacher);
+</code></pre>
+
+<ol>
+<li>删除</li>
+</ol>
+
+<pre><code class="language-java">@Delete(&quot;delete from teacher where id=#{0}&quot;)
+int delById(int id);
+</code></pre>
+
+<ol>
+<li>使用注解实现<code>&lt;resultMap&gt;</code>功能</li>
+</ol>
+
+<ul>
+<li>以N+1举例</li>
+<li>在StudentMapper接口添加查询
+
+<ul>
+<li><code>@Results</code>相当于<code>&lt;resultMap&gt;</code></li>
+<li><code>@Result</code>相当于<code>&lt;id/&gt;</code>或<code>&lt;result/&gt;</code></li>
+<li><code>@Result(id = true)</code>相当于<code>&lt;id/&gt;</code></li>
+<li><code>@Many()</code>相当于<code>&lt;collection/&gt;</code></li>
+<li><code>@One()</code>相当于<code>&lt;association/&gt;</code>
+<code>java
+@Results(value = {
+@Result(id = true, property = &quot;id&quot;, column = &quot;id&quot;),
+@Result(property = &quot;name&quot;, column = &quot;name&quot;),
+@Result(property = &quot;list&quot;, column = &quot;id&quot;, many = @Many(select =         &quot;com.sugar.mapper.StudentMapper.selByTid&quot;))
+})
+@Select(&quot;select * from teacher&quot;)
+List&lt;Teacher&gt; selTeacher();
+</code>
+
+# 十八、运行原理
+
+## 运行过程中涉及到的类
+
+1. Resources，MyBatis中IO流的工具类，加载配置文件
+
+2. SqlSessionFactoryBuilder()，构件器，创建SqlSessionFactory接口的实现类
+
+3. XMLConfigBuilder，MyBatis全局配置文件内容构建类，负责读取流内容并转换为JAVA代码
+
+4. Configuration，封装了全局配置文件的所有配置信息，全局配置文件存放在Configuration中
+
+5. DefaultSqlSessionFactory，SqlSessionFatory接口的实现类
+
+6. Transaction，事务类，每一个SqlSession会带有一个Transaction对象
+
+7. TransactionFactory，事务工厂，负责生产Transaction
+
+8. Executor，Mybatis执行器，负责执行SQL命令，相当于JDBC中statement对象(或PrepareStatement或CallableStatement)，默认的执行器是SimpleExcutor，批量操作BatchExcutor，通过openSession(参数控制)
+
+9. DefaultSqlSession，SqlSession接口的实现类
+
+10. ExceptionFactory，MyBatis中异常工厂
+
+## 流程示例
+
+<img src="https://cdn.jsdelivr.net/gh/sugarstar88/imgHosting/ITRHX-PIC/mybatisProcess.png" alt="" />
+
+## 文字解释
+
+在MyBatis运行开始时，先通过Resources加载全局配置文件，下面需要实例化SqlSessionFactoryBuilder构建器。帮助SqlSessionFactory接口实现类DefaultSqlSessionFactory。
+
+在实例化DefaultSqlSessionFactory之前需要先创建XmlConfigBuilder解析全局配置文件流，并把解析结果放在Configuration中，之后把Configuration传递给DefaultSqlSessionFactory，到此SqlSessionFactory工厂创建成功
+
+由SqlSessionFactory工厂创建SqlSession。
+
+每次创建SqlSession时，都需要由TransactionFactory创建Transaction对象，同时还需要创建SqlSession的执行器Excutor，最后实例化DefaultSqlSession，传递给SqlSession接口。
+
+根据项目需求使用SqlSession接口中的API完成具体的事务操作，如果事务执行成功提交给数据库，关闭SqlSession，如果事务执行失败，则需要进行rollback回滚事务，到此就是MyBatis的运行原理。</li>
+</ul></li>
+</ul>
+
+        </div>
+        <footer class="article-footer">
+    <a data-url="https://sugarstar88.github.io/2020/06/11/mybatis/" data-id="eb608d521c192ee314cd8e88e313d181" class="article-share-link">
+        <i class="fa fa-share"></i>
+        分享
+    </a>
+    
+    <a href="https://sugarstar88.github.io/2020/06/11/mybatis/#disqus_thread" class="article-comment-link">
+        评论
+    </a>
+    
+
+    <script>
+    (function ($) {
+        
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+    </script>
+</footer>
+
+    </div>
+
+    
+<nav id="article-nav">
+    
+    <a href="https://sugarstar88.github.io/2020/06/11/springmvc/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">
+          下一篇
+      </strong>
+      <div class="article-nav-title">SpringMVC</div>
+    </a>
+    
+
+    
+</nav>
+
+
+</article>
+
+
+<section id="comments">
+    <div id="disqus_thread">
+        <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "spf13" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+</section>
+
+
+    </section>
+
+   	
+    	<aside id="sidebar">
+    
+<div class="widget-wrap">
+    <h3 class="widget-title">
+        最新文章
+    </h3>
+    <div class="widget">
+        <ul id="recent-post">
+            
+            <li>
+                <div class="item-thumbnail">
+                    <a href="https://sugarstar88.github.io/2020/06/11/mybatis/" class="thumbnail">
+                    
+                        <span class="thumbnail-image thumbnail-none"></span>
+                    
+                    </a>
+                </div>
+                <div class="item-inner">
+                    
+                    <p class="item-title"><a href="https://sugarstar88.github.io/2020/06/11/mybatis/" class="title">MyBatis</a></p>
+                    <p class="item-date">
+                        <time datetime="2020-06-11 15:30:12 &#43;0800 CST" itemprop="datePublished">2020-06-11</time>
+                    </p>
+                </div>
+            </li>
+            
+            <li>
+                <div class="item-thumbnail">
+                    <a href="https://sugarstar88.github.io/2020/06/11/springmvc/" class="thumbnail">
+                    
+                        <span class="thumbnail-image thumbnail-none"></span>
+                    
+                    </a>
+                </div>
+                <div class="item-inner">
+                    
+                    <p class="item-title"><a href="https://sugarstar88.github.io/2020/06/11/springmvc/" class="title">SpringMVC</a></p>
+                    <p class="item-date">
+                        <time datetime="2020-06-11 15:29:12 &#43;0800 CST" itemprop="datePublished">2020-06-11</time>
+                    </p>
+                </div>
+            </li>
+            
+            <li>
+                <div class="item-thumbnail">
+                    <a href="https://sugarstar88.github.io/2020/06/11/spring/" class="thumbnail">
+                    
+                        <span class="thumbnail-image thumbnail-none"></span>
+                    
+                    </a>
+                </div>
+                <div class="item-inner">
+                    
+                    <p class="item-title"><a href="https://sugarstar88.github.io/2020/06/11/spring/" class="title">Spring</a></p>
+                    <p class="item-date">
+                        <time datetime="2020-06-11 15:17:12 &#43;0800 CST" itemprop="datePublished">2020-06-11</time>
+                    </p>
+                </div>
+            </li>
+            
+        </ul>
+    </div>
+</div>
+
+
+    
+
+
+
+
+
+    
+
+
+
+
+
+    
+
+
+
+
+
+
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+
+    
+	</div>
+</div>
+
+<footer id="footer">
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020
+      Powered by <a href="https://github.com/SugarStars">SugarStar</a>.
+    </div>
+  </div>
+</footer>
+
+
+<script src="https://sugarstar88.github.io/fancybox/jquery.fancybox.pack.js"></script>
+<script src="https://sugarstar88.github.io/js/script.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js"></script>
+
+
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']]}
+  });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+
+
+</body>
+</html>
